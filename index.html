@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ai Medical InFo – Journal of Scientific Research</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="site-header">
+    <div class="container header-inner">
+      <div class="logo">
+        <span class="logo-icon">&#x1F9EC;</span>
+        <div>
+          <span class="logo-name">Medical InFo</span>
+          <span class="logo-subtitle">Journal of Scientific Research</span>
+        </div>
+      </div>
+      <nav class="main-nav">
+        <ul>
+          <li><a href="#home" class="active">Home</a></li>
+          <li><a href="#articles">Articles</a></li>
+          <li><a href="#issues">Issues</a></li>
+          <li><a href="#editorial">Editorial Board</a></li>
+          <li><a href="#submit">Submit</a></li>
+          <li><a href="#about">About</a></li>
+        </ul>
+      </nav>
+      <button class="nav-toggle" id="navToggle">&#9776;</button>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero" id="home">
+    <div class="hero-bg"></div>
+    <div class="container hero-content">
+      <div class="hero-badge">Open Access · Peer-Reviewed</div>
+      <h1>Advancing Science,<br /><span class="accent">One Discovery at a Time</span></h1>
+      <p>Ai Medical InFo publishes high-quality, peer-reviewed research across computer science, data systems, biomedical engineering, and interdisciplinary sciences.</p>
+      <div class="hero-actions">
+        <a href="#articles" class="btn btn-primary">Browse Articles</a>
+        <a href="#submit" class="btn btn-outline">Submit Manuscript</a>
+      </div>
+      <div class="hero-stats">
+        <div class="stat"><span class="stat-num">1,240+</span><span class="stat-label">Published Articles</span></div>
+        <div class="stat"><span class="stat-num">320</span><span class="stat-label">Active Authors</span></div>
+        <div class="stat"><span class="stat-num">48</span><span class="stat-label">Countries Represented</span></div>
+        <div class="stat"><span class="stat-num">4.8</span><span class="stat-label">Impact Score</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- LATEST ARTICLES -->
+  <section class="section" id="articles">
+    <div class="container">
+      <div class="section-header">
+        <h2>Latest Articles</h2>
+        <p>Freshly published, open-access research from leading scientists worldwide.</p>
+      </div>
+      <div class="articles-filter">
+        <button class="filter-btn active" data-filter="all">All</button>
+        <button class="filter-btn" data-filter="cs">Computer Science</button>
+        <button class="filter-btn" data-filter="bio">Biomedical</button>
+        <button class="filter-btn" data-filter="data">Data Systems</button>
+        <button class="filter-btn" data-filter="env">Environmental</button>
+      </div>
+      <div class="articles-grid" id="articlesGrid">
+
+        <article class="article-card" data-category="cs">
+          <div class="article-meta">
+            <span class="tag tag-cs">Computer Science</span>
+            <span class="article-date">Apr 28, 2026</span>
+          </div>
+          <h3>Transformer-Based Architectures for Real-Time Genomic Sequence Analysis</h3>
+          <p class="article-authors">A. Moreno, L. Zhang, P. Okafor</p>
+          <p class="article-abstract">We propose a novel attention mechanism adapted from large language model architectures to accelerate genomic variant detection with 94.7% accuracy on benchmark datasets...</p>
+          <div class="article-footer">
+            <span class="article-doi">DOI: 10.1234/nfolab.2026.0421</span>
+            <a href="#" class="btn-link">Read Full Article &rarr;</a>
+          </div>
+        </article>
+
+        <article class="article-card" data-category="data">
+          <div class="article-meta">
+            <span class="tag tag-data">Data Systems</span>
+            <span class="article-date">Apr 22, 2026</span>
+          </div>
+          <h3>Federated Learning Under Non-IID Conditions: A Convergence Analysis</h3>
+          <p class="article-authors">R. Patel, S. Müller, T. Nakamura</p>
+          <p class="article-abstract">This paper provides a rigorous convergence analysis for federated learning algorithms under heterogeneous data distributions, proposing a new aggregation strategy...</p>
+          <div class="article-footer">
+            <span class="article-doi">DOI: 10.1234/nfolab.2026.0418</span>
+            <a href="#" class="btn-link">Read Full Article &rarr;</a>
+          </div>
+        </article>
+
+        <article class="article-card" data-category="bio">
+          <div class="article-meta">
+            <span class="tag tag-bio">Biomedical</span>
+            <span class="article-date">Apr 15, 2026</span>
+          </div>
+          <h3>CRISPR-Cas12a-Based Diagnostics for Point-of-Care Pathogen Detection</h3>
+          <p class="article-authors">Y. Osei, C. Laurent, M. Rivera</p>
+          <p class="article-abstract">We demonstrate a field-deployable CRISPR diagnostic assay achieving 10 aM sensitivity without cold-chain requirements, validated across six tropical pathogens...</p>
+          <div class="article-footer">
+            <span class="article-doi">DOI: 10.1234/nfolab.2026.0410</span>
+            <a href="#" class="btn-link">Read Full Article &rarr;</a>
+          </div>
+        </article>
+
+        <article class="article-card" data-category="env">
+          <div class="article-meta">
+            <span class="tag tag-env">Environmental</span>
+            <span class="article-date">Apr 10, 2026</span>
+          </div>
+          <h3>Microplastic Transport Dynamics in Deep-Sea Sediment Layers</h3>
+          <p class="article-authors">H. Lindqvist, B. Adeyemi, K. Watanabe</p>
+          <p class="article-abstract">Using autonomous underwater vehicle sampling, we map microplastic concentration gradients across abyssal plains, revealing previously unknown accumulation mechanisms...</p>
+          <div class="article-footer">
+            <span class="article-doi">DOI: 10.1234/nfolab.2026.0405</span>
+            <a href="#" class="btn-link">Read Full Article &rarr;</a>
+          </div>
+        </article>
+
+        <article class="article-card" data-category="cs">
+          <div class="article-meta">
+            <span class="tag tag-cs">Computer Science</span>
+            <span class="article-date">Apr 5, 2026</span>
+          </div>
+          <h3>Quantum Error Correction Using Topological Codes on NISQ Devices</h3>
+          <p class="article-authors">F. Chen, A. Guerrero, N. Ivanova</p>
+          <p class="article-abstract">We implement and benchmark surface-code error correction on 27-qubit hardware, achieving logical qubit lifetimes 3× longer than unencoded physical qubits...</p>
+          <div class="article-footer">
+            <span class="article-doi">DOI: 10.1234/nfolab.2026.0401</span>
+            <a href="#" class="btn-link">Read Full Article &rarr;</a>
+          </div>
+        </article>
+
+        <article class="article-card" data-category="data">
+          <div class="article-meta">
+            <span class="tag tag-data">Data Systems</span>
+            <span class="article-date">Mar 29, 2026</span>
+          </div>
+          <h3>Privacy-Preserving Graph Neural Networks via Differentially Private Message Passing</h3>
+          <p class="article-authors">D. Nwosu, I. Bergström, A. Kim</p>
+          <p class="article-abstract">We introduce DP-GNN, a framework that enforces (ε, δ)-differential privacy at the node level without sacrificing more than 4% of predictive accuracy on social network tasks...</p>
+          <div class="article-footer">
+            <span class="article-doi">DOI: 10.1234/nfolab.2026.0395</span>
+            <a href="#" class="btn-link">Read Full Article &rarr;</a>
+          </div>
+        </article>
+
+      </div>
+      <div class="center-btn">
+        <a href="#" class="btn btn-outline">View All Articles</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- CURRENT ISSUE -->
+  <section class="section section-alt" id="issues">
+    <div class="container">
+      <div class="section-header">
+        <h2>Current Issue</h2>
+        <p>Volume 12, Issue 2 — April/May 2026</p>
+      </div>
+      <div class="issue-grid">
+        <div class="issue-cover">
+          <div class="cover-art">
+            <div class="cover-title">Ai Medical InFo</div>
+            <div class="cover-vol">Vol. 12 · Issue 2 · 2026</div>
+            <div class="cover-img-placeholder">
+              <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="60" cy="60" r="50" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
+                <circle cx="60" cy="60" r="35" stroke="rgba(255,255,255,0.5)" stroke-width="2"/>
+                <circle cx="60" cy="60" r="20" fill="rgba(255,255,255,0.2)"/>
+                <line x1="10" y1="60" x2="110" y2="60" stroke="rgba(255,255,255,0.4)" stroke-width="1"/>
+                <line x1="60" y1="10" x2="60" y2="110" stroke="rgba(255,255,255,0.4)" stroke-width="1"/>
+                <line x1="25" y1="25" x2="95" y2="95" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
+                <line x1="95" y1="25" x2="25" y2="95" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
+              </svg>
+            </div>
+          </div>
+          <a href="#" class="btn btn-primary" style="width:100%;text-align:center;margin-top:1rem;">Download Full Issue (PDF)</a>
+        </div>
+        <div class="issue-toc">
+          <h3>Table of Contents</h3>
+          <ul class="toc-list">
+            <li>
+              <span class="toc-pages">1–18</span>
+              <div>
+                <strong>Transformer-Based Architectures for Real-Time Genomic Sequence Analysis</strong>
+                <span class="toc-authors">A. Moreno, L. Zhang, P. Okafor</span>
+              </div>
+            </li>
+            <li>
+              <span class="toc-pages">19–34</span>
+              <div>
+                <strong>Federated Learning Under Non-IID Conditions: A Convergence Analysis</strong>
+                <span class="toc-authors">R. Patel, S. Müller, T. Nakamura</span>
+              </div>
+            </li>
+            <li>
+              <span class="toc-pages">35–51</span>
+              <div>
+                <strong>CRISPR-Cas12a-Based Diagnostics for Point-of-Care Pathogen Detection</strong>
+                <span class="toc-authors">Y. Osei, C. Laurent, M. Rivera</span>
+              </div>
+            </li>
+            <li>
+              <span class="toc-pages">52–67</span>
+              <div>
+                <strong>Microplastic Transport Dynamics in Deep-Sea Sediment Layers</strong>
+                <span class="toc-authors">H. Lindqvist, B. Adeyemi, K. Watanabe</span>
+              </div>
+            </li>
+            <li>
+              <span class="toc-pages">68–82</span>
+              <div>
+                <strong>Quantum Error Correction Using Topological Codes on NISQ Devices</strong>
+                <span class="toc-authors">F. Chen, A. Guerrero, N. Ivanova</span>
+              </div>
+            </li>
+            <li>
+              <span class="toc-pages">83–99</span>
+              <div>
+                <strong>Privacy-Preserving Graph Neural Networks via Differentially Private Message Passing</strong>
+                <span class="toc-authors">D. Nwosu, I. Bergström, A. Kim</span>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- EDITORIAL BOARD -->
+  <section class="section" id="editorial">
+    <div class="container">
+      <div class="section-header">
+        <h2>Editorial Board</h2>
+        <p>Our international panel of leading researchers ensures rigorous, unbiased peer review.</p>
+      </div>
+      <div class="board-grid">
+
+        <div class="board-card editor-in-chief">
+          <div class="board-avatar" style="background:var(--color-primary)">EIC</div>
+          <div class="board-info">
+            <span class="board-role">Editor-in-Chief</span>
+            <h4>Prof. Amara Diallo</h4>
+            <p>MIT – Computer Science & AI Lab</p>
+          </div>
+        </div>
+
+        <div class="board-card">
+          <div class="board-avatar" style="background:#0891b2">AE</div>
+          <div class="board-info">
+            <span class="board-role">Associate Editor</span>
+            <h4>Dr. Hiroshi Tanaka</h4>
+            <p>University of Tokyo – Quantum Computing</p>
+          </div>
+        </div>
+
+        <div class="board-card">
+          <div class="board-avatar" style="background:#7c3aed">AE</div>
+          <div class="board-info">
+            <span class="board-role">Associate Editor</span>
+            <h4>Dr. Sofia Reyes</h4>
+            <p>ETH Zürich – Biomedical Engineering</p>
+          </div>
+        </div>
+
+        <div class="board-card">
+          <div class="board-avatar" style="background:#059669">AE</div>
+          <div class="board-info">
+            <span class="board-role">Associate Editor</span>
+            <h4>Prof. Kwame Asante</h4>
+            <p>Univ. of Cape Town – Environmental Science</p>
+          </div>
+        </div>
+
+        <div class="board-card">
+          <div class="board-avatar" style="background:#dc2626">AE</div>
+          <div class="board-info">
+            <span class="board-role">Associate Editor</span>
+            <h4>Dr. Irina Volkov</h4>
+            <p>INRIA Paris – Distributed Systems</p>
+          </div>
+        </div>
+
+        <div class="board-card">
+          <div class="board-avatar" style="background:#d97706">AE</div>
+          <div class="board-info">
+            <span class="board-role">Associate Editor</span>
+            <h4>Prof. Lena Andersen</h4>
+            <p>Karolinska Institute – Genomics</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- SUBMIT -->
+  <section class="section section-alt" id="submit">
+    <div class="container">
+      <div class="submit-grid">
+        <div class="submit-info">
+          <h2>Submit Your Research</h2>
+          <p>nfoLab welcomes original research articles, review papers, and short communications. All submissions undergo double-blind peer review.</p>
+          <ul class="submit-checklist">
+            <li>&#10003; Double-blind peer review within 6 weeks</li>
+            <li>&#10003; Open access — free to read worldwide</li>
+            <li>&#10003; DOI assigned to every article</li>
+            <li>&#10003; Indexed in Scopus, Web of Science & DOAJ</li>
+            <li>&#10003; No article processing charge (APC waiver available)</li>
+          </ul>
+          <a href="#" class="btn btn-primary">Author Guidelines</a>
+        </div>
+        <div class="submit-form-wrap">
+          <form class="submit-form" id="submitForm">
+            <h3>Manuscript Inquiry</h3>
+            <div class="form-group">
+              <label for="authorName">Corresponding Author</label>
+              <input type="text" id="authorName" placeholder="Full name" required />
+            </div>
+            <div class="form-group">
+              <label for="authorEmail">Email Address</label>
+              <input type="email" id="authorEmail" placeholder="your@institution.edu" required />
+            </div>
+            <div class="form-group">
+              <label for="manuscriptTitle">Manuscript Title</label>
+              <input type="text" id="manuscriptTitle" placeholder="Working title of your paper" required />
+            </div>
+            <div class="form-group">
+              <label for="researchArea">Research Area</label>
+              <select id="researchArea">
+                <option value="">Select area...</option>
+                <option>Computer Science</option>
+                <option>Biomedical Engineering</option>
+                <option>Data Systems</option>
+                <option>Environmental Science</option>
+                <option>Interdisciplinary</option>
+                <option>Other</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="abstract">Brief Abstract (250 words max)</label>
+              <textarea id="abstract" rows="4" placeholder="Summarize your key findings..."></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width:100%">Send Inquiry</button>
+            <p class="form-note">Full submission portal link will be sent to your email within 24 hours.</p>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section class="section" id="about">
+    <div class="container">
+      <div class="about-grid">
+        <div>
+          <h2>About nfoLab</h2>
+          <p>Founded in 2014, <strong>Ai Medical InFo – Journal of Scientific Research</strong> is an open-access, peer-reviewed publication dedicated to disseminating cutting-edge science across disciplines. We believe knowledge should be freely available to all, regardless of institutional affiliation.</p>
+          <p>Our editorial team is committed to rigorous methodology, reproducibility, and transparency. All published datasets and code are required to be publicly archived.</p>
+          <div class="about-metrics">
+            <div class="metric">
+              <span class="metric-val">6 weeks</span>
+              <span class="metric-label">Average review time</span>
+            </div>
+            <div class="metric">
+              <span class="metric-val">72%</span>
+              <span class="metric-label">Acceptance of invited revisions</span>
+            </div>
+            <div class="metric">
+              <span class="metric-val">18%</span>
+              <span class="metric-label">Overall acceptance rate</span>
+            </div>
+          </div>
+        </div>
+        <div class="about-aside">
+          <div class="about-card">
+            <h4>Indexing & Abstracting</h4>
+            <ul>
+              <li>Scopus</li>
+              <li>Web of Science (ESCI)</li>
+              <li>Directory of Open Access Journals (DOAJ)</li>
+              <li>PubMed Central (PMC)</li>
+              <li>Google Scholar</li>
+              <li>CrossRef</li>
+            </ul>
+          </div>
+          <div class="about-card">
+            <h4>ISSN</h4>
+            <p>Print: 2345-6789 &nbsp;|&nbsp; Online: 2345-6790</p>
+            <h4 style="margin-top:1rem">Publisher</h4>
+            <p>nfoLab Scientific Publishing, Inc.<br />Open Science Division</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- NEWSLETTER -->
+  <section class="newsletter-section">
+    <div class="container newsletter-inner">
+      <div>
+        <h3>Stay Up to Date</h3>
+        <p>Get the latest articles and journal news delivered to your inbox.</p>
+      </div>
+      <form class="newsletter-form" id="newsletterForm">
+        <input type="email" placeholder="Enter your email address" required />
+        <button type="submit" class="btn btn-primary">Subscribe</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <span class="logo-name" style="font-size:1.4rem">Ai Medical InFo</span>
+        <p>Journal of Scientific Research<br />Open Access · Peer-Reviewed · Since 2014</p>
+      </div>
+      <div class="footer-links">
+        <h5>Journal</h5>
+        <ul>
+          <li><a href="#articles">Articles</a></li>
+          <li><a href="#issues">Issues</a></li>
+          <li><a href="#editorial">Editorial Board</a></li>
+          <li><a href="#submit">Submit Manuscript</a></li>
+        </ul>
+      </div>
+      <div class="footer-links">
+        <h5>Policies</h5>
+        <ul>
+          <li><a href="#">Open Access Policy</a></li>
+          <li><a href="#">Peer Review Process</a></li>
+          <li><a href="#">Ethics &amp; Misconduct</a></li>
+          <li><a href="#">Copyright &amp; Licensing</a></li>
+        </ul>
+      </div>
+      <div class="footer-links">
+        <h5>Contact</h5>
+        <ul>
+          <li><a href="mailto:editor@aimedicalinfo.org">editor@aimedicalinfo.org</a></li>
+          <li><a href="mailto:submissions@aimedicalinfo.org">submissions@aimedicalinfo.org</a></li>
+          <li><a href="#">Twitter / X</a></li>
+          <li><a href="#">LinkedIn</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="container">
+        <p>&copy; 2026 Ai Medical InFo Scientific Publishing. All articles published under <a href="#">CC BY 4.0</a>.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="main.js"></script>
+</body>
+</html>
