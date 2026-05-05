@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Connexion — Ai Medical InFo</title>
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="login.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet"/>
+</head>
+<body class="login-body">
+
+  <div class="login-page">
+
+    <!-- LEFT PANEL -->
+    <div class="login-left">
+      <div class="login-brand">
+        <div class="brand-logo">
+          <svg viewBox="0 0 40 40" fill="none">
+            <circle cx="20" cy="20" r="18" stroke="#fff" stroke-width="2"/>
+            <path d="M6 20h5l3-7 4 14 4-10 3 3h9" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <span class="brand-name">Ai Medical InFo</span>
+        <span class="brand-sub">Plateforme e-Santé Adaptative</span>
+      </div>
+
+      <div class="login-features">
+        <div class="lf-item"><span class="lf-dot"></span>Surveillance en temps réel 24/7</div>
+        <div class="lf-item"><span class="lf-dot"></span>Adaptation dynamique des modules</div>
+        <div class="lf-item"><span class="lf-dot"></span>Alertes graduées instantanées</div>
+        <div class="lf-item"><span class="lf-dot"></span>Conforme HL7 FHIR & RGPD</div>
+      </div>
+
+      <div class="login-ecg">
+        <svg viewBox="0 0 400 50" preserveAspectRatio="none">
+          <polyline class="ecg-line-login"
+            points="0,25 30,25 45,25 55,5 63,45 72,25 100,25 130,25 145,25 155,6 163,44 172,25 200,25 230,25 245,25 255,5 263,45 272,25 300,25 330,25 345,25 355,5 363,45 372,25 400,25"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- RIGHT PANEL -->
+    <div class="login-right">
+      <div class="login-box">
+
+        <h2>Connexion</h2>
+        <p class="login-subtitle">Sélectionnez votre rôle pour accéder à votre espace.</p>
+
+        <!-- ROLE SELECTOR -->
+        <div class="role-grid" id="roleGrid">
+          <button class="role-card" data-role="patient" onclick="selectRole('patient')">
+            <span class="role-icon">&#128100;</span>
+            <span class="role-name">Patient</span>
+          </button>
+          <button class="role-card" data-role="medecin" onclick="selectRole('medecin')">
+            <span class="role-icon">&#128104;&#8205;&#9877;&#65039;</span>
+            <span class="role-name">Médecin</span>
+          </button>
+          <button class="role-card" data-role="directeur" onclick="selectRole('directeur')">
+            <span class="role-icon">&#128084;</span>
+            <span class="role-name">Directeur</span>
+          </button>
+          <button class="role-card" data-role="administration" onclick="selectRole('administration')">
+            <span class="role-icon">&#128736;&#65039;</span>
+            <span class="role-name">Administration</span>
+          </button>
+        </div>
+
+        <!-- LOGIN FORM -->
+        <form class="login-form" id="loginForm" onsubmit="handleLogin(event)">
+          <div class="selected-role-banner" id="roleBanner"></div>
+
+          <div class="form-group">
+            <label for="username">Identifiant</label>
+            <div class="input-wrap">
+              <svg class="input-icon" viewBox="0 0 20 20" fill="none">
+                <circle cx="10" cy="7" r="3" stroke="currentColor" stroke-width="1.5"/>
+                <path d="M3 17c0-3.3 3.1-6 7-6s7 2.7 7 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+              <input type="text" id="username" placeholder="Votre identifiant" required autocomplete="username"/>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="password">Mot de passe</label>
+            <div class="input-wrap">
+              <svg class="input-icon" viewBox="0 0 20 20" fill="none">
+                <rect x="3" y="8" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.5"/>
+                <path d="M7 8V6a3 3 0 0 1 6 0v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                <circle cx="10" cy="13" r="1.5" fill="currentColor"/>
+              </svg>
+              <input type="password" id="password" placeholder="••••••••" required autocomplete="current-password"/>
+              <button type="button" class="toggle-pw" onclick="togglePw()">&#128065;</button>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <label class="checkbox-opt">
+              <input type="checkbox" id="rememberMe"/> Se souvenir de moi
+            </label>
+            <a href="#" class="forgot-link">Mot de passe oublié ?</a>
+          </div>
+
+          <button type="submit" class="btn-login" id="loginBtn">Se connecter</button>
+
+          <div class="demo-hint" id="demoHint"></div>
+          <div class="login-error" id="loginError"></div>
+        </form>
+
+        <div class="login-footer-note">
+          <a href="index.html">&larr; Retour au site principal</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="login.js"></script>
+</body>
+</html>

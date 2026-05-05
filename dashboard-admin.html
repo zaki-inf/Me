@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Administration — Ai Medical InFo</title>
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="login.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet"/>
+</head>
+<body class="dash-body">
+
+<aside class="dash-sidebar">
+  <div class="sidebar-brand">
+    <div class="sidebar-brand-icon">
+      <svg viewBox="0 0 40 40" fill="none"><circle cx="20" cy="20" r="18" stroke="#fff" stroke-width="2"/><path d="M6 20h5l3-7 4 14 4-10 3 3h9" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div>
+      <div class="sidebar-brand-name">Ai Medical InFo</div>
+      <div class="sidebar-brand-role">Administration Système</div>
+    </div>
+  </div>
+  <div class="sidebar-user">
+    <div class="sidebar-avatar" style="background:#b45309" id="sidebarAvatar">AS</div>
+    <div>
+      <div class="sidebar-user-name" id="sidebarName">Admin Système</div>
+      <div class="sidebar-user-role">Super Administrateur</div>
+    </div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="sidebar-section-label">Gestion</div>
+    <button class="sidebar-link active" onclick="showPanel('systeme')"><span class="sidebar-link-icon">🖥️</span> État Système</button>
+    <button class="sidebar-link" onclick="showPanel('utilisateurs')"><span class="sidebar-link-icon">👥</span> Utilisateurs</button>
+    <button class="sidebar-link" onclick="showPanel('roles')"><span class="sidebar-link-icon">🔐</span> Rôles & Accès</button>
+    <div class="sidebar-section-label">Infrastructure</div>
+    <button class="sidebar-link" onclick="showPanel('serveurs')"><span class="sidebar-link-icon">🌐</span> Serveurs</button>
+    <button class="sidebar-link" onclick="showPanel('logs')"><span class="sidebar-link-icon">📋</span> Journaux</button>
+    <button class="sidebar-link" onclick="showPanel('parametres')"><span class="sidebar-link-icon">⚙️</span> Paramètres</button>
+  </nav>
+  <div class="sidebar-footer">
+    <button class="btn-logout" onclick="logout()">🚪 Déconnexion</button>
+  </div>
+</aside>
+
+<main class="dash-main">
+  <div class="dash-topbar">
+    <span class="topbar-title" id="topbarTitle">Administration Système</span>
+    <div class="topbar-right">
+      <span class="topbar-badge badge-administration">Administration</span>
+      <div class="topbar-notif">🔔<span class="notif-count">4</span></div>
+    </div>
+  </div>
+
+  <div class="dash-content">
+
+    <!-- ÉTAT SYSTÈME -->
+    <div class="dash-panel active" id="panel-systeme">
+      <div class="panel-title">État du Système</div>
+      <div class="panel-sub">Surveillance en temps réel de l'infrastructure — 05/05/2026 11:32.</div>
+
+      <div class="kpi-grid">
+        <div class="kpi-card kpi-ok"><div class="kpi-label">Statut global</div><div class="kpi-value" style="font-size:1.2rem; color:#10b981">Opérationnel</div><div class="kpi-sub">Tous les services actifs</div></div>
+        <div class="kpi-card kpi-info"><div class="kpi-label">Utilisateurs connectés</div><div class="kpi-value">42</div><div class="kpi-sub">En ce moment</div></div>
+        <div class="kpi-card kpi-ok"><div class="kpi-label">CPU moyen</div><div class="kpi-value">38%</div><div class="kpi-sub">6 serveurs</div></div>
+        <div class="kpi-card kpi-warn"><div class="kpi-label">Stockage utilisé</div><div class="kpi-value">67%</div><div class="kpi-sub">2.4 TB / 3.6 TB</div></div>
+      </div>
+
+      <div class="two-col">
+        <div class="card">
+          <h3>Services & Microservices</h3>
+          <div class="alert-list">
+            <div class="alert-item alert-ok"><span class="alert-icon">✅</span><div><div class="alert-text">API Gateway — Opérationnel</div><div class="alert-time">Latence : 12ms</div></div></div>
+            <div class="alert-item alert-ok"><span class="alert-icon">✅</span><div><div class="alert-text">Moteur d'Adaptation — Actif</div><div class="alert-time">165 règles chargées</div></div></div>
+            <div class="alert-item alert-ok"><span class="alert-icon">✅</span><div><div class="alert-text">Apache Kafka — 6 partitions actives</div><div class="alert-time">Lag : 0 message</div></div></div>
+            <div class="alert-item alert-ok"><span class="alert-icon">✅</span><div><div class="alert-text">TimescaleDB — Réplication active</div><div class="alert-time">1.8M enregistrements/jour</div></div></div>
+            <div class="alert-item alert-warning"><span class="alert-icon">⚠️</span><div><div class="alert-text">Serveur S3 — Espace faible (67%)</div><div class="alert-time">Recommandation : extension sous 30 jours</div></div></div>
+          </div>
+        </div>
+        <div class="card">
+          <h3>Alertes système récentes</h3>
+          <div class="alert-list">
+            <div class="alert-item alert-warning"><span class="alert-icon">🟡</span><div><div class="alert-text">Stockage base TimescaleDB atteint 67%</div><div class="alert-time">Aujourd'hui 10:15</div></div></div>
+            <div class="alert-item alert-info"><span class="alert-icon">🔵</span><div><div class="alert-text">Mise à jour moteur ML v2.3.1 disponible</div><div class="alert-time">Hier 23:00</div></div></div>
+            <div class="alert-item alert-ok"><span class="alert-icon">✅</span><div><div class="alert-text">Sauvegarde automatique complète</div><div class="alert-time">Hier 02:00</div></div></div>
+            <div class="alert-item alert-ok"><span class="alert-icon">✅</span><div><div class="alert-text">Certificats TLS renouvelés</div><div class="alert-time">02/05/2026</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- UTILISATEURS -->
+    <div class="dash-panel" id="panel-utilisateurs">
+      <div class="panel-title">Gestion des Utilisateurs</div>
+      <div class="panel-sub">Tous les comptes actifs sur la plateforme.</div>
+
+      <div class="kpi-grid">
+        <div class="kpi-card kpi-info"><div class="kpi-label">Total utilisateurs</div><div class="kpi-value">186</div></div>
+        <div class="kpi-card kpi-ok"><div class="kpi-label">Actifs ce mois</div><div class="kpi-value">142</div></div>
+        <div class="kpi-card kpi-warn"><div class="kpi-label">Comptes inactifs</div><div class="kpi-value">9</div></div>
+        <div class="kpi-card kpi-alert"><div class="kpi-label">Tentatives échouées</div><div class="kpi-value">3</div><div class="kpi-sub">Aujourd'hui</div></div>
+      </div>
+
+      <div class="card">
+        <h3>Utilisateurs récents</h3>
+        <div class="user-mgmt-grid">
+          <div class="user-mgmt-card">
+            <div class="um-avatar" style="background:#2563eb">AB</div>
+            <div><div class="um-name">Ahmed Benali</div><div class="um-role">Patient • Actif</div></div>
+            <div class="um-actions"><button class="um-btn">Modifier</button><button class="um-btn" style="color:#dc2626">Désactiver</button></div>
+          </div>
+          <div class="user-mgmt-card">
+            <div class="um-avatar" style="background:#059669">SM</div>
+            <div><div class="um-name">Dr. Sophie Martin</div><div class="um-role">Médecin • Actif</div></div>
+            <div class="um-actions"><button class="um-btn">Modifier</button><button class="um-btn" style="color:#dc2626">Désactiver</button></div>
+          </div>
+          <div class="user-mgmt-card">
+            <div class="um-avatar" style="background:#7c3aed">KO</div>
+            <div><div class="um-name">Karim Oussama</div><div class="um-role">Directeur • Actif</div></div>
+            <div class="um-actions"><button class="um-btn">Modifier</button><button class="um-btn" style="color:#dc2626">Désactiver</button></div>
+          </div>
+          <div class="user-mgmt-card">
+            <div class="um-avatar" style="background:#0891b2">RK</div>
+            <div><div class="um-name">Dr. Riad Khelil</div><div class="um-role">Médecin • Actif</div></div>
+            <div class="um-actions"><button class="um-btn">Modifier</button><button class="um-btn" style="color:#dc2626">Désactiver</button></div>
+          </div>
+          <div class="user-mgmt-card">
+            <div class="um-avatar" style="background:#dc2626">LK</div>
+            <div><div class="um-name">M. Larbi Kamel</div><div class="um-role">Patient • Critique</div></div>
+            <div class="um-actions"><button class="um-btn">Modifier</button><button class="um-btn" style="color:#dc2626">Désactiver</button></div>
+          </div>
+          <div class="user-mgmt-card">
+            <div class="um-avatar" style="background:#94a3b8">NN</div>
+            <div><div class="um-name">Mme N. Nour</div><div class="um-role">Patient • Inactif</div></div>
+            <div class="um-actions"><button class="um-btn">Réactiver</button><button class="um-btn" style="color:#dc2626">Supprimer</button></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Créer un nouveau compte</h3>
+        <form class="dash-form" onsubmit="event.preventDefault(); alert('Compte créé ! Invitation envoyée par email.');">
+          <div class="three-col">
+            <div class="form-group"><label>Prénom & Nom</label><input type="text" placeholder="Nom complet"/></div>
+            <div class="form-group"><label>Email</label><input type="email" placeholder="email@institution.dz"/></div>
+            <div class="form-group"><label>Rôle</label><select><option>Patient</option><option>Médecin</option><option>Directeur</option><option>Administration</option></select></div>
+          </div>
+          <button type="submit" class="btn-save">Créer le compte</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- RÔLES -->
+    <div class="dash-panel" id="panel-roles">
+      <div class="panel-title">Rôles & Permissions</div>
+      <div class="panel-sub">Matrice des droits d'accès par rôle.</div>
+      <div class="card">
+        <h3>Permissions par rôle</h3>
+        <table class="data-table">
+          <thead><tr><th>Permission</th><th>Patient</th><th>Médecin</th><th>Directeur</th><th>Administration</th></tr></thead>
+          <tbody>
+            <tr><td>Voir ses propres constantes</td><td>✅</td><td>✅</td><td>—</td><td>✅</td></tr>
+            <tr><td>Voir les constantes des patients</td><td>❌</td><td>✅</td><td>📊 Stats</td><td>✅</td></tr>
+            <tr><td>Créer des ordonnances</td><td>❌</td><td>✅</td><td>❌</td><td>❌</td></tr>
+            <tr><td>Gérer les alertes</td><td>❌</td><td>✅</td><td>📊 Vue</td><td>✅</td></tr>
+            <tr><td>Statistiques globales</td><td>❌</td><td>❌</td><td>✅</td><td>✅</td></tr>
+            <tr><td>Gérer les utilisateurs</td><td>❌</td><td>❌</td><td>❌</td><td>✅</td></tr>
+            <tr><td>Configuration système</td><td>❌</td><td>❌</td><td>❌</td><td>✅</td></tr>
+            <tr><td>Accès journaux (logs)</td><td>❌</td><td>❌</td><td>📊 Résumé</td><td>✅</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- SERVEURS -->
+    <div class="dash-panel" id="panel-serveurs">
+      <div class="panel-title">Infrastructure Serveurs</div>
+      <div class="panel-sub">État des nœuds de l'infrastructure cloud.</div>
+      <div class="card">
+        <h3>Nœuds actifs</h3>
+        <table class="data-table">
+          <thead><tr><th>Serveur</th><th>Rôle</th><th>CPU</th><th>RAM</th><th>Disque</th><th>État</th></tr></thead>
+          <tbody>
+            <tr><td><strong>node-01</strong></td><td>API Gateway</td><td>22%</td><td>45%</td><td>30%</td><td><span class="status-dot"><span class="dot dot-green"></span>Actif</span></td></tr>
+            <tr><td><strong>node-02</strong></td><td>Stream Processing</td><td>58%</td><td>72%</td><td>41%</td><td><span class="status-dot"><span class="dot dot-green"></span>Actif</span></td></tr>
+            <tr><td><strong>node-03</strong></td><td>Base de données</td><td>35%</td><td>81%</td><td>67%</td><td><span class="status-dot"><span class="dot dot-orange"></span>Charge haute</span></td></tr>
+            <tr><td><strong>node-04</strong></td><td>Moteur ML / AI</td><td>44%</td><td>60%</td><td>28%</td><td><span class="status-dot"><span class="dot dot-green"></span>Actif</span></td></tr>
+            <tr><td><strong>node-05</strong></td><td>Backup / Archive</td><td>8%</td><td>25%</td><td>54%</td><td><span class="status-dot"><span class="dot dot-green"></span>Actif</span></td></tr>
+            <tr><td><strong>node-06</strong></td><td>Standby failover</td><td>2%</td><td>10%</td><td>12%</td><td><span class="status-dot"><span class="dot dot-gray"></span>Standby</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- LOGS -->
+    <div class="dash-panel" id="panel-logs">
+      <div class="panel-title">Journaux d'Activité</div>
+      <div class="panel-sub">Audit trail complet — Accès, modifications, alertes système.</div>
+      <div class="card">
+        <h3>Derniers événements</h3>
+        <table class="data-table">
+          <thead><tr><th>Heure</th><th>Utilisateur</th><th>Action</th><th>IP</th><th>Résultat</th></tr></thead>
+          <tbody>
+            <tr><td>11:32</td><td>admin</td><td>Connexion</td><td>192.168.1.10</td><td style="color:#10b981;font-weight:700">Succès</td></tr>
+            <tr><td>11:28</td><td>Système</td><td>Alerte critique — M. Larbi SpO₂ 88%</td><td>—</td><td style="color:#ef4444;font-weight:700">Déclenchée</td></tr>
+            <tr><td>11:10</td><td>dr.martin</td><td>Connexion</td><td>10.0.2.45</td><td style="color:#10b981;font-weight:700">Succès</td></tr>
+            <tr><td>10:55</td><td>Inconnu</td><td>Tentative de connexion</td><td>185.45.21.3</td><td style="color:#ef4444;font-weight:700">Échec — Bloqué</td></tr>
+            <tr><td>10:15</td><td>Système</td><td>Alerte stockage 67%</td><td>node-03</td><td style="color:#f59e0b;font-weight:700">Avertissement</td></tr>
+            <tr><td>09:40</td><td>patient01</td><td>Connexion</td><td>10.0.5.88</td><td style="color:#10b981;font-weight:700">Succès</td></tr>
+            <tr><td>02:00</td><td>Système</td><td>Sauvegarde automatique</td><td>node-05</td><td style="color:#10b981;font-weight:700">Complète</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- PARAMÈTRES -->
+    <div class="dash-panel" id="panel-parametres">
+      <div class="panel-title">Paramètres Système</div>
+      <div class="panel-sub">Configuration globale de la plateforme e-Santé.</div>
+      <div class="two-col">
+        <div class="card">
+          <h3>Seuils d'alerte</h3>
+          <form class="dash-form" onsubmit="event.preventDefault(); alert('Paramètres sauvegardés !');">
+            <div class="form-group"><label>SpO₂ critique (&lt;)</label><input type="number" value="90" min="80" max="95"/></div>
+            <div class="form-group"><label>FC max alerte (bpm &gt;)</label><input type="number" value="100" min="90" max="130"/></div>
+            <div class="form-group"><label>Température fièvre (°C &gt;)</label><input type="number" step="0.1" value="38.5"/></div>
+            <div class="form-group"><label>Intervalle heartbeat (sec)</label><input type="number" value="30" min="10" max="120"/></div>
+            <button type="submit" class="btn-save">Sauvegarder</button>
+          </form>
+        </div>
+        <div class="card">
+          <h3>Configuration réseau</h3>
+          <form class="dash-form" onsubmit="event.preventDefault(); alert('Configuration réseau mise à jour !');">
+            <div class="form-group"><label>Seuil bas débit (Kbps)</label><input type="number" value="128"/></div>
+            <div class="form-group"><label>Compression mode dégradé</label><select><option>Maximum</option><option>Élevée</option><option>Modérée</option></select></div>
+            <div class="form-group"><label>Timeout reconnexion (sec)</label><input type="number" value="10"/></div>
+            <div class="form-group"><label>Mode de bascule réseau</label><select><option>Automatique</option><option>Manuel</option></select></div>
+            <button type="submit" class="btn-save">Appliquer</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<script src="dashboard.js"></script>
+</body>
+</html>

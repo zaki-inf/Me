@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Espace Directeur — Ai Medical InFo</title>
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="login.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet"/>
+</head>
+<body class="dash-body">
+
+<aside class="dash-sidebar">
+  <div class="sidebar-brand">
+    <div class="sidebar-brand-icon">
+      <svg viewBox="0 0 40 40" fill="none"><circle cx="20" cy="20" r="18" stroke="#fff" stroke-width="2"/><path d="M6 20h5l3-7 4 14 4-10 3 3h9" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div>
+      <div class="sidebar-brand-name">Ai Medical InFo</div>
+      <div class="sidebar-brand-role">Direction</div>
+    </div>
+  </div>
+  <div class="sidebar-user">
+    <div class="sidebar-avatar" style="background:#7c3aed" id="sidebarAvatar">KO</div>
+    <div>
+      <div class="sidebar-user-name" id="sidebarName">M. Karim Oussama</div>
+      <div class="sidebar-user-role">Directeur</div>
+    </div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="sidebar-section-label">Direction</div>
+    <button class="sidebar-link active" onclick="showPanel('vue')"><span class="sidebar-link-icon">📊</span> Vue globale</button>
+    <button class="sidebar-link" onclick="showPanel('performance')"><span class="sidebar-link-icon">📈</span> Performance</button>
+    <button class="sidebar-link" onclick="showPanel('ressources')"><span class="sidebar-link-icon">🏥</span> Ressources</button>
+    <div class="sidebar-section-label">Rapports</div>
+    <button class="sidebar-link" onclick="showPanel('statistiques')"><span class="sidebar-link-icon">🔢</span> Statistiques</button>
+    <button class="sidebar-link" onclick="showPanel('conformite')"><span class="sidebar-link-icon">✅</span> Conformité</button>
+  </nav>
+  <div class="sidebar-footer">
+    <button class="btn-logout" onclick="logout()">🚪 Déconnexion</button>
+  </div>
+</aside>
+
+<main class="dash-main">
+  <div class="dash-topbar">
+    <span class="topbar-title" id="topbarTitle">Vue Globale — Direction</span>
+    <div class="topbar-right">
+      <span class="topbar-badge badge-directeur">Directeur</span>
+      <div class="topbar-notif">🔔<span class="notif-count">1</span></div>
+    </div>
+  </div>
+
+  <div class="dash-content">
+
+    <!-- VUE GLOBALE -->
+    <div class="dash-panel active" id="panel-vue">
+      <div class="panel-title">Vue Globale de la Plateforme</div>
+      <div class="panel-sub">Indicateurs clés — Mai 2026 — Établissements pilotes A & B.</div>
+
+      <div class="kpi-grid">
+        <div class="kpi-card kpi-info"><div class="kpi-label">Patients actifs</div><div class="kpi-value">147</div><div class="kpi-sub">+12 ce mois</div></div>
+        <div class="kpi-card kpi-ok"><div class="kpi-label">Médecins connectés</div><div class="kpi-value">18</div><div class="kpi-sub">2 établissements</div></div>
+        <div class="kpi-card kpi-ok"><div class="kpi-label">Uptime plateforme</div><div class="kpi-value">99.8%</div><div class="kpi-sub">Ce mois</div></div>
+        <div class="kpi-card kpi-warn"><div class="kpi-label">Alertes critiques/mois</div><div class="kpi-value">14</div><div class="kpi-sub">-41% vs mois dernier</div></div>
+      </div>
+
+      <div class="two-col">
+        <div class="card">
+          <h3>Répartition des patients par état</h3>
+          <div style="margin-bottom:.75rem">
+            <div class="progress-row" style="display:flex;align-items:center;gap:.75rem;margin-bottom:.5rem">
+              <span class="progress-label" style="width:80px;font-size:.82rem;color:#64748b">Stables</span>
+              <div class="progress-bar" style="flex:1;height:10px;background:#e2e8f0;border-radius:999px;overflow:hidden"><div class="progress-fill fill-green" style="width:75%;height:100%;background:#10b981;border-radius:999px"></div></div>
+              <span class="progress-val" style="width:50px;text-align:right;font-size:.82rem;font-weight:700">110 (75%)</span>
+            </div>
+            <div class="progress-row" style="display:flex;align-items:center;gap:.75rem;margin-bottom:.5rem">
+              <span class="progress-label" style="width:80px;font-size:.82rem;color:#64748b">Modérés</span>
+              <div class="progress-bar" style="flex:1;height:10px;background:#e2e8f0;border-radius:999px;overflow:hidden"><div class="progress-fill fill-orange" style="width:18%;height:100%;background:#f59e0b;border-radius:999px"></div></div>
+              <span class="progress-val" style="width:50px;text-align:right;font-size:.82rem;font-weight:700">26 (18%)</span>
+            </div>
+            <div class="progress-row" style="display:flex;align-items:center;gap:.75rem">
+              <span class="progress-label" style="width:80px;font-size:.82rem;color:#64748b">Critiques</span>
+              <div class="progress-bar" style="flex:1;height:10px;background:#e2e8f0;border-radius:999px;overflow:hidden"><div class="progress-fill fill-red" style="width:7%;height:100%;background:#ef4444;border-radius:999px"></div></div>
+              <span class="progress-val" style="width:50px;text-align:right;font-size:.82rem;font-weight:700">11 (7%)</span>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <h3>Utilisation des modules d'adaptation</h3>
+          <div style="margin-bottom:.75rem">
+            <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:.5rem">
+              <span style="width:110px;font-size:.82rem;color:#64748b">Mode normal</span>
+              <div style="flex:1;height:8px;background:#e2e8f0;border-radius:999px;overflow:hidden"><div style="width:62%;height:100%;background:#2563eb;border-radius:999px"></div></div>
+              <span style="width:35px;text-align:right;font-size:.82rem;font-weight:700">62%</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:.5rem">
+              <span style="width:110px;font-size:.82rem;color:#64748b">Mode dégradé</span>
+              <div style="flex:1;height:8px;background:#e2e8f0;border-radius:999px;overflow:hidden"><div style="width:21%;height:100%;background:#f59e0b;border-radius:999px"></div></div>
+              <span style="width:35px;text-align:right;font-size:.82rem;font-weight:700">21%</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:.5rem">
+              <span style="width:110px;font-size:.82rem;color:#64748b">Mode modéré</span>
+              <div style="flex:1;height:8px;background:#e2e8f0;border-radius:999px;overflow:hidden"><div style="width:10%;height:100%;background:#10b981;border-radius:999px"></div></div>
+              <span style="width:35px;text-align:right;font-size:.82rem;font-weight:700">10%</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:.75rem">
+              <span style="width:110px;font-size:.82rem;color:#64748b">Mode critique</span>
+              <div style="flex:1;height:8px;background:#e2e8f0;border-radius:999px;overflow:hidden"><div style="width:7%;height:100%;background:#ef4444;border-radius:999px"></div></div>
+              <span style="width:35px;text-align:right;font-size:.82rem;font-weight:700">7%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Activité par établissement</h3>
+        <table class="data-table">
+          <thead><tr><th>Établissement</th><th>Patients</th><th>Médecins</th><th>Alertes/mois</th><th>Uptime</th><th>État</th></tr></thead>
+          <tbody>
+            <tr><td><strong>CHU Alger — Site A</strong></td><td>89</td><td>11</td><td>8</td><td>99.9%</td><td><span class="level stable">Opérationnel</span></td></tr>
+            <tr><td><strong>Clinique Oran — Site B</strong></td><td>58</td><td>7</td><td>6</td><td>99.6%</td><td><span class="level stable">Opérationnel</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- PERFORMANCE -->
+    <div class="dash-panel" id="panel-performance">
+      <div class="panel-title">Performance du Système</div>
+      <div class="panel-sub">Métriques techniques de la plateforme e-Santé.</div>
+      <div class="kpi-grid">
+        <div class="kpi-card kpi-ok"><div class="kpi-label">Latence moyenne</div><div class="kpi-value">142ms</div><div class="kpi-sub">Objectif &lt;200ms ✓</div></div>
+        <div class="kpi-card kpi-ok"><div class="kpi-label">Précision détection</div><div class="kpi-value">94.7%</div><div class="kpi-sub">Anomalies critiques</div></div>
+        <div class="kpi-card kpi-ok"><div class="kpi-label">Faux positifs</div><div class="kpi-value">-41%</div><div class="kpi-sub">vs. système précédent</div></div>
+        <div class="kpi-card kpi-info"><div class="kpi-label">Données traitées</div><div class="kpi-value">2.4M</div><div class="kpi-sub">Mesures ce mois</div></div>
+      </div>
+    </div>
+
+    <!-- RESSOURCES -->
+    <div class="dash-panel" id="panel-ressources">
+      <div class="panel-title">Ressources & Capacités</div>
+      <div class="panel-sub">Gestion des ressources humaines et matérielles.</div>
+      <div class="kpi-grid">
+        <div class="kpi-card kpi-info"><div class="kpi-label">Médecins actifs</div><div class="kpi-value">18</div></div>
+        <div class="kpi-card kpi-warn"><div class="kpi-label">Capacité max</div><div class="kpi-value">200</div><div class="kpi-sub">Patients — 73% utilisé</div></div>
+        <div class="kpi-card kpi-ok"><div class="kpi-label">Capteurs déployés</div><div class="kpi-value">203</div></div>
+        <div class="kpi-card kpi-ok"><div class="kpi-label">Serveurs cloud</div><div class="kpi-value">6</div><div class="kpi-sub">4 actifs / 2 standby</div></div>
+      </div>
+    </div>
+
+    <!-- STATISTIQUES -->
+    <div class="dash-panel" id="panel-statistiques">
+      <div class="panel-title">Statistiques Mensuelles</div>
+      <div class="panel-sub">Résumé analytique — Avril 2026.</div>
+      <div class="kpi-grid">
+        <div class="kpi-card kpi-info"><div class="kpi-label">Consultations réalisées</div><div class="kpi-value">342</div></div>
+        <div class="kpi-card kpi-ok"><div class="kpi-label">Hospitalisations évitées</div><div class="kpi-value">28</div><div class="kpi-sub">Grâce aux alertes précoces</div></div>
+        <div class="kpi-card kpi-ok"><div class="kpi-label">Satisfaction patients</div><div class="kpi-value">4.6/5</div></div>
+        <div class="kpi-card kpi-info"><div class="kpi-label">Économies estimées</div><div class="kpi-value">84k€</div><div class="kpi-sub">Coûts hospitaliers évités</div></div>
+      </div>
+    </div>
+
+    <!-- CONFORMITÉ -->
+    <div class="dash-panel" id="panel-conformite">
+      <div class="panel-title">Conformité & Réglementation</div>
+      <div class="panel-sub">Audit de conformité aux standards médicaux et réglementaires.</div>
+      <div class="card">
+        <h3>État de conformité</h3>
+        <table class="data-table">
+          <thead><tr><th>Standard</th><th>Description</th><th>Statut</th><th>Dernière vérification</th></tr></thead>
+          <tbody>
+            <tr><td><strong>RGPD</strong></td><td>Protection des données personnelles</td><td><span class="level stable">Conforme</span></td><td>01/05/2026</td></tr>
+            <tr><td><strong>HL7 FHIR R4</strong></td><td>Interopérabilité des données médicales</td><td><span class="level stable">Conforme</span></td><td>15/04/2026</td></tr>
+            <tr><td><strong>ISO 13485</strong></td><td>Dispositifs médicaux — management qualité</td><td><span class="level stable">Conforme</span></td><td>10/04/2026</td></tr>
+            <tr><td><strong>IEC 62304</strong></td><td>Logiciels dispositifs médicaux</td><td><span class="level moderate">En révision</span></td><td>20/04/2026</td></tr>
+            <tr><td><strong>HDS</strong></td><td>Hébergeur de données de santé</td><td><span class="level stable">Certifié</span></td><td>01/01/2026</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<script src="dashboard.js"></script>
+</body>
+</html>

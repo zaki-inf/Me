@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Espace Médecin — Ai Medical InFo</title>
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="login.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet"/>
+</head>
+<body class="dash-body">
+
+<aside class="dash-sidebar">
+  <div class="sidebar-brand">
+    <div class="sidebar-brand-icon">
+      <svg viewBox="0 0 40 40" fill="none"><circle cx="20" cy="20" r="18" stroke="#fff" stroke-width="2"/><path d="M6 20h5l3-7 4 14 4-10 3 3h9" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div>
+      <div class="sidebar-brand-name">Ai Medical InFo</div>
+      <div class="sidebar-brand-role">Espace Médecin</div>
+    </div>
+  </div>
+  <div class="sidebar-user">
+    <div class="sidebar-avatar" style="background:#059669" id="sidebarAvatar">SM</div>
+    <div>
+      <div class="sidebar-user-name" id="sidebarName">Dr. Sophie Martin</div>
+      <div class="sidebar-user-role">Médecin référent</div>
+    </div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="sidebar-section-label">Surveillance</div>
+    <button class="sidebar-link active" onclick="showPanel('tableau')"><span class="sidebar-link-icon">🖥️</span> Tableau de bord</button>
+    <button class="sidebar-link" onclick="showPanel('patients')"><span class="sidebar-link-icon">👥</span> Mes Patients</button>
+    <button class="sidebar-link" onclick="showPanel('alertes')"><span class="sidebar-link-icon">🚨</span> Alertes <span style="margin-left:auto;background:#ef4444;color:#fff;border-radius:999px;padding:.1rem .45rem;font-size:.7rem;font-weight:700;">3</span></button>
+    <div class="sidebar-section-label">Clinique</div>
+    <button class="sidebar-link" onclick="showPanel('consultations')"><span class="sidebar-link-icon">📅</span> Consultations</button>
+    <button class="sidebar-link" onclick="showPanel('prescriptions')"><span class="sidebar-link-icon">💊</span> Prescriptions</button>
+    <button class="sidebar-link" onclick="showPanel('rapports')"><span class="sidebar-link-icon">📊</span> Rapports</button>
+  </nav>
+  <div class="sidebar-footer">
+    <button class="btn-logout" onclick="logout()">🚪 Déconnexion</button>
+  </div>
+</aside>
+
+<main class="dash-main">
+  <div class="dash-topbar">
+    <span class="topbar-title" id="topbarTitle">Vue d'ensemble</span>
+    <div class="topbar-right">
+      <span class="topbar-badge badge-medecin">Médecin</span>
+      <div class="topbar-notif">🔔<span class="notif-count">3</span></div>
+    </div>
+  </div>
+
+  <div class="dash-content">
+
+    <!-- TABLEAU DE BORD -->
+    <div class="dash-panel active" id="panel-tableau">
+      <div class="panel-title">Vue d'ensemble — Surveillance en cours</div>
+      <div class="panel-sub">12 patients sous surveillance active au 05/05/2026.</div>
+
+      <div class="kpi-grid">
+        <div class="kpi-card kpi-ok"><div class="kpi-label">Patients stables</div><div class="kpi-value">9</div><div class="kpi-sub">75% du total</div></div>
+        <div class="kpi-card kpi-warn"><div class="kpi-label">Patients modérés</div><div class="kpi-value">2</div><div class="kpi-sub">Surveillance accrue</div></div>
+        <div class="kpi-card kpi-alert"><div class="kpi-label">Patients critiques</div><div class="kpi-value">1</div><div class="kpi-sub">⚠ Action requise</div></div>
+        <div class="kpi-card kpi-info"><div class="kpi-label">Alertes aujourd'hui</div><div class="kpi-value">3</div><div class="kpi-sub">2 traitées / 1 en cours</div></div>
+      </div>
+
+      <div class="two-col">
+        <div class="card">
+          <h3>🚨 Alertes actives</h3>
+          <div class="alert-list">
+            <div class="alert-item alert-critical">
+              <span class="alert-icon">🔴</span>
+              <div><div class="alert-text">Patient M. Larbi — SpO₂ : 88% — Mode CRITIQUE activé</div><div class="alert-time">Il y a 4 min — Chambre 12</div></div>
+            </div>
+            <div class="alert-item alert-warning">
+              <span class="alert-icon">🟡</span>
+              <div><div class="alert-text">Patient Mme Farah — FC > 110 bpm depuis 15 min</div><div class="alert-time">Il y a 18 min</div></div>
+            </div>
+            <div class="alert-item alert-warning">
+              <span class="alert-icon">🟡</span>
+              <div><div class="alert-text">Patient M. Hassan — Température : 38.7°C</div><div class="alert-time">Il y a 32 min</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <h3>Adaptation réseau en cours</h3>
+          <div class="alert-list">
+            <div class="alert-item alert-critical">
+              <span class="alert-icon">📡</span>
+              <div><div class="alert-text">M. Larbi — Réseau dégradé (Edge) — Compression max activée, ECG à 250 Hz</div><div class="alert-time">Mode critique maintenu malgré réseau faible</div></div>
+            </div>
+            <div class="alert-item alert-ok">
+              <span class="alert-icon">📶</span>
+              <div><div class="alert-text">9 patients — Connexion WiFi/5G optimale, tous modules actifs</div><div class="alert-time">Fréquence standard</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Patients sous surveillance — Vue rapide</h3>
+        <table class="data-table">
+          <thead><tr><th>Patient</th><th>FC</th><th>SpO₂</th><th>Temp.</th><th>Réseau</th><th>État</th></tr></thead>
+          <tbody>
+            <tr><td><strong>M. Larbi K.</strong></td><td>108</td><td style="color:#ef4444;font-weight:700">88%</td><td>37.2°C</td><td>Edge</td><td><span class="level critical">Critique</span></td></tr>
+            <tr><td><strong>Mme Farah N.</strong></td><td style="color:#f59e0b;font-weight:700">113</td><td>96%</td><td>37.0°C</td><td>4G</td><td><span class="level moderate">Modéré</span></td></tr>
+            <tr><td><strong>M. Hassan B.</strong></td><td>88</td><td>97%</td><td style="color:#f59e0b;font-weight:700">38.7°C</td><td>WiFi</td><td><span class="level moderate">Modéré</span></td></tr>
+            <tr><td><strong>Ahmed Benali</strong></td><td>72</td><td>98%</td><td>36.8°C</td><td>WiFi</td><td><span class="level stable">Stable</span></td></tr>
+            <tr><td><strong>Mme Amira S.</strong></td><td>68</td><td>99%</td><td>36.5°C</td><td>WiFi</td><td><span class="level stable">Stable</span></td></tr>
+            <tr><td><strong>M. Youssef M.</strong></td><td>76</td><td>97%</td><td>36.9°C</td><td>4G</td><td><span class="level stable">Stable</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- PATIENTS -->
+    <div class="dash-panel" id="panel-patients">
+      <div class="panel-title">Mes Patients</div>
+      <div class="panel-sub">Liste complète des patients sous votre surveillance.</div>
+      <div class="card">
+        <h3>Liste des patients (12 actifs)</h3>
+        <table class="data-table">
+          <thead><tr><th>Nom</th><th>Âge</th><th>Pathologie</th><th>Dispositif</th><th>Depuis</th><th>État</th><th>Action</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Larbi K.</strong></td><td>67</td><td>Insuffisance cardiaque</td><td>IoT capteur</td><td>12/04</td><td><span class="level critical">Critique</span></td><td><button class="um-btn">Voir</button></td></tr>
+            <tr><td><strong>Farah N.</strong></td><td>54</td><td>Arythmie</td><td>Tablette</td><td>02/05</td><td><span class="level moderate">Modéré</span></td><td><button class="um-btn">Voir</button></td></tr>
+            <tr><td><strong>Hassan B.</strong></td><td>45</td><td>HTA</td><td>Tablette</td><td>15/04</td><td><span class="level moderate">Modéré</span></td><td><button class="um-btn">Voir</button></td></tr>
+            <tr><td><strong>Benali A.</strong></td><td>38</td><td>Suivi post-op</td><td>Station</td><td>11/04</td><td><span class="level stable">Stable</span></td><td><button class="um-btn">Voir</button></td></tr>
+            <tr><td><strong>Amira S.</strong></td><td>29</td><td>Grossesse à risque</td><td>Tablette</td><td>20/04</td><td><span class="level stable">Stable</span></td><td><button class="um-btn">Voir</button></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ALERTES -->
+    <div class="dash-panel" id="panel-alertes">
+      <div class="panel-title">Gestion des Alertes</div>
+      <div class="panel-sub">Alertes générées par le moteur d'adaptation — 05/05/2026.</div>
+      <div class="kpi-grid">
+        <div class="kpi-card kpi-alert"><div class="kpi-label">Alertes critiques</div><div class="kpi-value">1</div><div class="kpi-sub">Non résolue</div></div>
+        <div class="kpi-card kpi-warn"><div class="kpi-label">Alertes modérées</div><div class="kpi-value">2</div><div class="kpi-sub">En observation</div></div>
+        <div class="kpi-card kpi-ok"><div class="kpi-label">Résolues aujourd'hui</div><div class="kpi-value">2</div><div class="kpi-sub">Traitées</div></div>
+      </div>
+      <div class="card">
+        <h3>Toutes les alertes du jour</h3>
+        <table class="data-table">
+          <thead><tr><th>Heure</th><th>Patient</th><th>Type</th><th>Valeur</th><th>Seuil</th><th>Statut</th></tr></thead>
+          <tbody>
+            <tr><td>11:28</td><td>M. Larbi</td><td>SpO₂ critique</td><td style="color:#ef4444;font-weight:700">88%</td><td>&lt;90%</td><td><span class="level critical">En cours</span></td></tr>
+            <tr><td>11:10</td><td>Mme Farah</td><td>Tachycardie</td><td style="color:#f59e0b;font-weight:700">113 bpm</td><td>&gt;100</td><td><span class="level moderate">En cours</span></td></tr>
+            <tr><td>10:52</td><td>M. Hassan</td><td>Fièvre</td><td style="color:#f59e0b;font-weight:700">38.7°C</td><td>&gt;38.5°C</td><td><span class="level moderate">En cours</span></td></tr>
+            <tr><td>08:30</td><td>Mme Amira</td><td>FC basse</td><td>55 bpm</td><td>&lt;55</td><td><span class="level stable">Résolu</span></td></tr>
+            <tr><td>07:15</td><td>M. Benali</td><td>SpO₂ basse</td><td>94%</td><td>&lt;95%</td><td><span class="level stable">Résolu</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- CONSULTATIONS -->
+    <div class="dash-panel" id="panel-consultations">
+      <div class="panel-title">Consultations</div>
+      <div class="panel-sub">Planning des téléconsultations et visites.</div>
+      <div class="card">
+        <h3>Agenda — Mai 2026</h3>
+        <table class="data-table">
+          <thead><tr><th>Date</th><th>Heure</th><th>Patient</th><th>Type</th><th>État</th></tr></thead>
+          <tbody>
+            <tr><td><strong>08/05</strong></td><td>10h30</td><td>Ahmed Benali</td><td>Téléconsultation</td><td><span class="level stable">Confirmé</span></td></tr>
+            <tr><td>09/05</td><td>14h00</td><td>Mme Farah N.</td><td>Bilan arythmie</td><td><span class="level stable">Confirmé</span></td></tr>
+            <tr><td>12/05</td><td>09h30</td><td>M. Hassan B.</td><td>Contrôle tension</td><td><span class="level moderate">En attente</span></td></tr>
+            <tr><td>15/05</td><td>11h00</td><td>M. Larbi K.</td><td>Urgence cardiaque</td><td><span class="level critical">Priorité haute</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- PRESCRIPTIONS -->
+    <div class="dash-panel" id="panel-prescriptions">
+      <div class="panel-title">Prescriptions</div>
+      <div class="panel-sub">Créer et gérer les ordonnances de vos patients.</div>
+      <div class="card">
+        <h3>Nouvelle ordonnance</h3>
+        <form class="dash-form" onsubmit="event.preventDefault(); alert('Ordonnance créée et envoyée au patient !');">
+          <div class="two-col">
+            <div class="form-group"><label>Patient</label><select><option>Ahmed Benali</option><option>Mme Farah N.</option><option>M. Hassan B.</option></select></div>
+            <div class="form-group"><label>Date de début</label><input type="date"/></div>
+          </div>
+          <div class="form-group"><label>Médicament & posologie</label><textarea rows="3" placeholder="Ex : Lisinopril 10mg — 1 comprimé/jour le matin..."></textarea></div>
+          <div class="form-group"><label>Durée</label><select><option>1 mois</option><option>3 mois</option><option>6 mois</option></select></div>
+          <button type="submit" class="btn-save">Émettre l'ordonnance</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- RAPPORTS -->
+    <div class="dash-panel" id="panel-rapports">
+      <div class="panel-title">Rapports Médicaux</div>
+      <div class="panel-sub">Analyses générées automatiquement par la plateforme.</div>
+      <div class="kpi-grid">
+        <div class="kpi-card kpi-info"><div class="kpi-label">Rapports ce mois</div><div class="kpi-value">24</div></div>
+        <div class="kpi-card kpi-ok"><div class="kpi-label">Anomalies détectées</div><div class="kpi-value">7</div><div class="kpi-sub">Dont 1 critique</div></div>
+        <div class="kpi-card kpi-ok"><div class="kpi-label">Taux de suivi</div><div class="kpi-value">91%</div></div>
+      </div>
+      <div class="card">
+        <h3>Derniers rapports générés</h3>
+        <table class="data-table">
+          <thead><tr><th>Patient</th><th>Type</th><th>Date</th><th>Conclusion</th></tr></thead>
+          <tbody>
+            <tr><td>M. Larbi K.</td><td>ECG 24h</td><td>04/05/2026</td><td style="color:#ef4444;font-weight:700">Fibrillation détectée</td></tr>
+            <tr><td>Ahmed Benali</td><td>Bilan mensuel</td><td>03/05/2026</td><td style="color:#10b981;font-weight:700">Normal</td></tr>
+            <tr><td>Mme Farah N.</td><td>Holter 48h</td><td>01/05/2026</td><td style="color:#f59e0b;font-weight:700">Arythmie modérée</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<script src="dashboard.js"></script>
+</body>
+</html>

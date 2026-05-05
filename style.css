@@ -43,6 +43,8 @@ ul { list-style: none; }
 .main-nav ul { display: flex; gap: .15rem; }
 .main-nav a { padding: .4rem .8rem; border-radius: 7px; font-size: .88rem; font-weight: 500; color: var(--color-muted); transition: color .2s, background .2s; }
 .main-nav a:hover, .main-nav a.active { color: var(--color-primary); background: #eff6ff; }
+.btn-connexion { padding: .45rem 1.1rem; background: var(--color-primary); color: #fff; border-radius: 8px; font-size: .88rem; font-weight: 700; transition: background .2s, transform .2s; white-space: nowrap; }
+.btn-connexion:hover { background: var(--color-primary-dark); transform: translateY(-1px); }
 .nav-toggle { display: none; background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--color-text); }
 
 /* ===== HERO ===== */
