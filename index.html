@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Ai Medical InFo – Journal of Scientific Research</title>
+  <title>Ai Medical InFo – Plateforme e-Santé Adaptative</title>
   <link rel="stylesheet" href="style.css" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet" />
 </head>
@@ -13,20 +13,25 @@
   <header class="site-header">
     <div class="container header-inner">
       <div class="logo">
-        <span class="logo-icon">&#x1F9EC;</span>
+        <div class="logo-pulse">
+          <svg viewBox="0 0 40 40" fill="none">
+            <circle cx="20" cy="20" r="18" stroke="#2563eb" stroke-width="2"/>
+            <path d="M6 20h5l3-7 4 14 4-10 3 3h9" stroke="#2563eb" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
         <div>
-          <span class="logo-name">Medical InFo</span>
-          <span class="logo-subtitle">Journal of Scientific Research</span>
+          <span class="logo-name">Ai Medical InFo</span>
+          <span class="logo-subtitle">Plateforme e-Santé Adaptative</span>
         </div>
       </div>
       <nav class="main-nav">
         <ul>
-          <li><a href="#home" class="active">Home</a></li>
-          <li><a href="#articles">Articles</a></li>
-          <li><a href="#issues">Issues</a></li>
-          <li><a href="#editorial">Editorial Board</a></li>
-          <li><a href="#submit">Submit</a></li>
-          <li><a href="#about">About</a></li>
+          <li><a href="#accueil" class="active">Accueil</a></li>
+          <li><a href="#systeme">Système</a></li>
+          <li><a href="#modules">Modules</a></li>
+          <li><a href="#adaptation">Adaptation</a></li>
+          <li><a href="#architecture">Architecture</a></li>
+          <li><a href="#resultats">Résultats</a></li>
         </ul>
       </nav>
       <button class="nav-toggle" id="navToggle">&#9776;</button>
@@ -34,388 +39,623 @@
   </header>
 
   <!-- HERO -->
-  <section class="hero" id="home">
+  <section class="hero" id="accueil">
     <div class="hero-bg"></div>
     <div class="container hero-content">
-      <div class="hero-badge">Open Access · Peer-Reviewed</div>
-      <h1>Advancing Science,<br /><span class="accent">One Discovery at a Time</span></h1>
-      <p>Ai Medical InFo publishes high-quality, peer-reviewed research across computer science, data systems, biomedical engineering, and interdisciplinary sciences.</p>
+      <div class="hero-badge">
+        <span class="pulse-dot"></span>
+        Cas d'étude — Surveillance à distance en temps réel
+      </div>
+      <h1>Plateforme e-Santé<br /><span class="accent">pour la Surveillance<br />à Distance de Patients</span></h1>
+      <p>Le système adapte en temps réel les modules de traitement de données (ECG, saturation, etc.) en fonction de la gravité de l'état du patient, de la qualité réseau et du type de dispositif utilisé.</p>
       <div class="hero-actions">
-        <a href="#articles" class="btn btn-primary">Browse Articles</a>
-        <a href="#submit" class="btn btn-outline">Submit Manuscript</a>
+        <a href="#systeme" class="btn btn-primary">Découvrir le système</a>
+        <a href="#architecture" class="btn btn-outline">Architecture technique</a>
       </div>
       <div class="hero-stats">
-        <div class="stat"><span class="stat-num">1,240+</span><span class="stat-label">Published Articles</span></div>
-        <div class="stat"><span class="stat-num">320</span><span class="stat-label">Active Authors</span></div>
-        <div class="stat"><span class="stat-num">48</span><span class="stat-label">Countries Represented</span></div>
-        <div class="stat"><span class="stat-num">4.8</span><span class="stat-label">Impact Score</span></div>
+        <div class="stat">
+          <span class="stat-num">3</span>
+          <span class="stat-label">Critères d'adaptation</span>
+        </div>
+        <div class="stat">
+          <span class="stat-num">5+</span>
+          <span class="stat-label">Modules de données</span>
+        </div>
+        <div class="stat">
+          <span class="stat-num">&lt;200ms</span>
+          <span class="stat-label">Latence de réponse</span>
+        </div>
+        <div class="stat">
+          <span class="stat-num">24/7</span>
+          <span class="stat-label">Surveillance continue</span>
+        </div>
+      </div>
+    </div>
+    <!-- ECG Animation -->
+    <div class="hero-ecg">
+      <svg viewBox="0 0 800 80" preserveAspectRatio="none">
+        <polyline class="ecg-line" points="0,40 60,40 80,40 95,10 105,70 120,40 160,40 220,40 240,40 255,15 265,65 280,40 320,40 380,40 400,40 415,12 425,68 440,40 480,40 540,40 560,40 575,14 585,66 600,40 640,40 700,40 720,40 735,13 745,67 760,40 800,40"/>
+      </svg>
+    </div>
+  </section>
+
+  <!-- PRÉSENTATION DU SYSTÈME -->
+  <section class="section" id="systeme">
+    <div class="container">
+      <div class="section-header">
+        <h2>Présentation du Système</h2>
+        <p>Une architecture intelligente qui s'adapte dynamiquement à trois paramètres clés.</p>
+      </div>
+
+      <div class="system-overview">
+        <div class="overview-card card-severity">
+          <div class="ov-icon">
+            <svg viewBox="0 0 48 48" fill="none">
+              <circle cx="24" cy="24" r="20" stroke="currentColor" stroke-width="2.5"/>
+              <path d="M24 14v12l7 4" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <h3>Gravité du Patient</h3>
+          <p>Classification en 3 niveaux (stable, modéré, critique) déclenchant une adaptation immédiate de la fréquence et précision de collecte.</p>
+          <div class="severity-levels">
+            <span class="level stable">Stable</span>
+            <span class="level moderate">Modéré</span>
+            <span class="level critical">Critique</span>
+          </div>
+        </div>
+
+        <div class="overview-card card-network">
+          <div class="ov-icon">
+            <svg viewBox="0 0 48 48" fill="none">
+              <path d="M6 32 Q12 18 24 16 Q36 18 42 32" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+              <path d="M12 38 Q18 26 24 24 Q30 26 36 38" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+              <circle cx="24" cy="42" r="3" fill="currentColor"/>
+            </svg>
+          </div>
+          <h3>Qualité Réseau</h3>
+          <p>Détection automatique de la bande passante disponible : WiFi haut débit, 4G/5G, ou connexion dégradée pour ajuster la compression des données.</p>
+          <div class="network-bars" id="networkBars">
+            <span class="bar b1 active"></span>
+            <span class="bar b2 active"></span>
+            <span class="bar b3 active"></span>
+            <span class="bar b4"></span>
+          </div>
+        </div>
+
+        <div class="overview-card card-device">
+          <div class="ov-icon">
+            <svg viewBox="0 0 48 48" fill="none">
+              <rect x="10" y="8" width="18" height="32" rx="3" stroke="currentColor" stroke-width="2.5"/>
+              <circle cx="19" cy="36" r="2" fill="currentColor"/>
+              <rect x="30" y="16" width="10" height="18" rx="2" stroke="currentColor" stroke-width="2"/>
+              <circle cx="35" cy="30" r="1.5" fill="currentColor"/>
+            </svg>
+          </div>
+          <h3>Type de Dispositif</h3>
+          <p>Optimisation selon le matériel : capteur IoT bas de gamme, tablette médicale, ou poste clinique haute performance.</p>
+          <div class="device-tags">
+            <span class="dtag">IoT Capteur</span>
+            <span class="dtag">Tablette</span>
+            <span class="dtag">Station clinique</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Flow Diagram -->
+      <div class="flow-diagram">
+        <div class="flow-node fn-patient">
+          <span class="fn-icon">&#128100;</span>
+          <span>Patient</span>
+        </div>
+        <div class="flow-arrow">&#8594;</div>
+        <div class="flow-node fn-sensor">
+          <span class="fn-icon">&#128268;</span>
+          <span>Capteurs</span>
+        </div>
+        <div class="flow-arrow">&#8594;</div>
+        <div class="flow-node fn-adapt highlight-node">
+          <span class="fn-icon">&#9881;</span>
+          <span>Moteur<br/>d'adaptation</span>
+        </div>
+        <div class="flow-arrow">&#8594;</div>
+        <div class="flow-node fn-cloud">
+          <span class="fn-icon">&#9729;</span>
+          <span>Traitement<br/>cloud</span>
+        </div>
+        <div class="flow-arrow">&#8594;</div>
+        <div class="flow-node fn-doctor">
+          <span class="fn-icon">&#128104;&#8205;&#9877;</span>
+          <span>Médecin</span>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- LATEST ARTICLES -->
-  <section class="section" id="articles">
+  <!-- MODULES DE TRAITEMENT -->
+  <section class="section section-alt" id="modules">
     <div class="container">
       <div class="section-header">
-        <h2>Latest Articles</h2>
-        <p>Freshly published, open-access research from leading scientists worldwide.</p>
+        <h2>Modules de Traitement de Données</h2>
+        <p>Chaque module s'active, se met en veille ou change de résolution selon le contexte détecté.</p>
       </div>
-      <div class="articles-filter">
-        <button class="filter-btn active" data-filter="all">All</button>
-        <button class="filter-btn" data-filter="cs">Computer Science</button>
-        <button class="filter-btn" data-filter="bio">Biomedical</button>
-        <button class="filter-btn" data-filter="data">Data Systems</button>
-        <button class="filter-btn" data-filter="env">Environmental</button>
-      </div>
-      <div class="articles-grid" id="articlesGrid">
 
-        <article class="article-card" data-category="cs">
-          <div class="article-meta">
-            <span class="tag tag-cs">Computer Science</span>
-            <span class="article-date">Apr 28, 2026</span>
-          </div>
-          <h3>Transformer-Based Architectures for Real-Time Genomic Sequence Analysis</h3>
-          <p class="article-authors">A. Moreno, L. Zhang, P. Okafor</p>
-          <p class="article-abstract">We propose a novel attention mechanism adapted from large language model architectures to accelerate genomic variant detection with 94.7% accuracy on benchmark datasets...</p>
-          <div class="article-footer">
-            <span class="article-doi">DOI: 10.1234/nfolab.2026.0421</span>
-            <a href="#" class="btn-link">Read Full Article &rarr;</a>
-          </div>
-        </article>
+      <div class="modules-grid">
 
-        <article class="article-card" data-category="data">
-          <div class="article-meta">
-            <span class="tag tag-data">Data Systems</span>
-            <span class="article-date">Apr 22, 2026</span>
-          </div>
-          <h3>Federated Learning Under Non-IID Conditions: A Convergence Analysis</h3>
-          <p class="article-authors">R. Patel, S. Müller, T. Nakamura</p>
-          <p class="article-abstract">This paper provides a rigorous convergence analysis for federated learning algorithms under heterogeneous data distributions, proposing a new aggregation strategy...</p>
-          <div class="article-footer">
-            <span class="article-doi">DOI: 10.1234/nfolab.2026.0418</span>
-            <a href="#" class="btn-link">Read Full Article &rarr;</a>
-          </div>
-        </article>
-
-        <article class="article-card" data-category="bio">
-          <div class="article-meta">
-            <span class="tag tag-bio">Biomedical</span>
-            <span class="article-date">Apr 15, 2026</span>
-          </div>
-          <h3>CRISPR-Cas12a-Based Diagnostics for Point-of-Care Pathogen Detection</h3>
-          <p class="article-authors">Y. Osei, C. Laurent, M. Rivera</p>
-          <p class="article-abstract">We demonstrate a field-deployable CRISPR diagnostic assay achieving 10 aM sensitivity without cold-chain requirements, validated across six tropical pathogens...</p>
-          <div class="article-footer">
-            <span class="article-doi">DOI: 10.1234/nfolab.2026.0410</span>
-            <a href="#" class="btn-link">Read Full Article &rarr;</a>
-          </div>
-        </article>
-
-        <article class="article-card" data-category="env">
-          <div class="article-meta">
-            <span class="tag tag-env">Environmental</span>
-            <span class="article-date">Apr 10, 2026</span>
-          </div>
-          <h3>Microplastic Transport Dynamics in Deep-Sea Sediment Layers</h3>
-          <p class="article-authors">H. Lindqvist, B. Adeyemi, K. Watanabe</p>
-          <p class="article-abstract">Using autonomous underwater vehicle sampling, we map microplastic concentration gradients across abyssal plains, revealing previously unknown accumulation mechanisms...</p>
-          <div class="article-footer">
-            <span class="article-doi">DOI: 10.1234/nfolab.2026.0405</span>
-            <a href="#" class="btn-link">Read Full Article &rarr;</a>
-          </div>
-        </article>
-
-        <article class="article-card" data-category="cs">
-          <div class="article-meta">
-            <span class="tag tag-cs">Computer Science</span>
-            <span class="article-date">Apr 5, 2026</span>
-          </div>
-          <h3>Quantum Error Correction Using Topological Codes on NISQ Devices</h3>
-          <p class="article-authors">F. Chen, A. Guerrero, N. Ivanova</p>
-          <p class="article-abstract">We implement and benchmark surface-code error correction on 27-qubit hardware, achieving logical qubit lifetimes 3× longer than unencoded physical qubits...</p>
-          <div class="article-footer">
-            <span class="article-doi">DOI: 10.1234/nfolab.2026.0401</span>
-            <a href="#" class="btn-link">Read Full Article &rarr;</a>
-          </div>
-        </article>
-
-        <article class="article-card" data-category="data">
-          <div class="article-meta">
-            <span class="tag tag-data">Data Systems</span>
-            <span class="article-date">Mar 29, 2026</span>
-          </div>
-          <h3>Privacy-Preserving Graph Neural Networks via Differentially Private Message Passing</h3>
-          <p class="article-authors">D. Nwosu, I. Bergström, A. Kim</p>
-          <p class="article-abstract">We introduce DP-GNN, a framework that enforces (ε, δ)-differential privacy at the node level without sacrificing more than 4% of predictive accuracy on social network tasks...</p>
-          <div class="article-footer">
-            <span class="article-doi">DOI: 10.1234/nfolab.2026.0395</span>
-            <a href="#" class="btn-link">Read Full Article &rarr;</a>
-          </div>
-        </article>
-
-      </div>
-      <div class="center-btn">
-        <a href="#" class="btn btn-outline">View All Articles</a>
-      </div>
-    </div>
-  </section>
-
-  <!-- CURRENT ISSUE -->
-  <section class="section section-alt" id="issues">
-    <div class="container">
-      <div class="section-header">
-        <h2>Current Issue</h2>
-        <p>Volume 12, Issue 2 — April/May 2026</p>
-      </div>
-      <div class="issue-grid">
-        <div class="issue-cover">
-          <div class="cover-art">
-            <div class="cover-title">Ai Medical InFo</div>
-            <div class="cover-vol">Vol. 12 · Issue 2 · 2026</div>
-            <div class="cover-img-placeholder">
-              <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="60" cy="60" r="50" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
-                <circle cx="60" cy="60" r="35" stroke="rgba(255,255,255,0.5)" stroke-width="2"/>
-                <circle cx="60" cy="60" r="20" fill="rgba(255,255,255,0.2)"/>
-                <line x1="10" y1="60" x2="110" y2="60" stroke="rgba(255,255,255,0.4)" stroke-width="1"/>
-                <line x1="60" y1="10" x2="60" y2="110" stroke="rgba(255,255,255,0.4)" stroke-width="1"/>
-                <line x1="25" y1="25" x2="95" y2="95" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
-                <line x1="95" y1="25" x2="25" y2="95" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
+        <div class="module-card">
+          <div class="module-header">
+            <div class="module-icon icon-ecg">
+              <svg viewBox="0 0 36 36" fill="none">
+                <path d="M2 18h6l3-8 5 16 4-10 3 2h11" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
             </div>
+            <div>
+              <h3>ECG</h3>
+              <span class="module-status active-status">Actif</span>
+            </div>
           </div>
-          <a href="#" class="btn btn-primary" style="width:100%;text-align:center;margin-top:1rem;">Download Full Issue (PDF)</a>
+          <p>Analyse du signal électrocardiogramme. Fréquence d'échantillonnage adaptée de 125 Hz (réseau faible) à 500 Hz (réseau optimal).</p>
+          <div class="module-params">
+            <div class="param">
+              <span class="param-label">Fréquence</span>
+              <div class="param-bar"><div class="param-fill" style="width:80%"></div></div>
+              <span class="param-val">400 Hz</span>
+            </div>
+            <div class="param">
+              <span class="param-label">Compression</span>
+              <div class="param-bar"><div class="param-fill" style="width:30%"></div></div>
+              <span class="param-val">Faible</span>
+            </div>
+          </div>
         </div>
-        <div class="issue-toc">
-          <h3>Table of Contents</h3>
-          <ul class="toc-list">
-            <li>
-              <span class="toc-pages">1–18</span>
-              <div>
-                <strong>Transformer-Based Architectures for Real-Time Genomic Sequence Analysis</strong>
-                <span class="toc-authors">A. Moreno, L. Zhang, P. Okafor</span>
-              </div>
-            </li>
-            <li>
-              <span class="toc-pages">19–34</span>
-              <div>
-                <strong>Federated Learning Under Non-IID Conditions: A Convergence Analysis</strong>
-                <span class="toc-authors">R. Patel, S. Müller, T. Nakamura</span>
-              </div>
-            </li>
-            <li>
-              <span class="toc-pages">35–51</span>
-              <div>
-                <strong>CRISPR-Cas12a-Based Diagnostics for Point-of-Care Pathogen Detection</strong>
-                <span class="toc-authors">Y. Osei, C. Laurent, M. Rivera</span>
-              </div>
-            </li>
-            <li>
-              <span class="toc-pages">52–67</span>
-              <div>
-                <strong>Microplastic Transport Dynamics in Deep-Sea Sediment Layers</strong>
-                <span class="toc-authors">H. Lindqvist, B. Adeyemi, K. Watanabe</span>
-              </div>
-            </li>
-            <li>
-              <span class="toc-pages">68–82</span>
-              <div>
-                <strong>Quantum Error Correction Using Topological Codes on NISQ Devices</strong>
-                <span class="toc-authors">F. Chen, A. Guerrero, N. Ivanova</span>
-              </div>
-            </li>
-            <li>
-              <span class="toc-pages">83–99</span>
-              <div>
-                <strong>Privacy-Preserving Graph Neural Networks via Differentially Private Message Passing</strong>
-                <span class="toc-authors">D. Nwosu, I. Bergström, A. Kim</span>
-              </div>
-            </li>
-          </ul>
+
+        <div class="module-card">
+          <div class="module-header">
+            <div class="module-icon icon-spo2">
+              <svg viewBox="0 0 36 36" fill="none">
+                <circle cx="18" cy="18" r="14" stroke="currentColor" stroke-width="2.2"/>
+                <path d="M18 10 Q22 14 18 18 Q14 22 18 26" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <div>
+              <h3>SpO₂ — Saturation</h3>
+              <span class="module-status active-status">Actif</span>
+            </div>
+          </div>
+          <p>Mesure du taux d'oxygène dans le sang. En mode critique, les lectures passent à une fréquence de 1 s ; en mode stable, toutes les 30 s.</p>
+          <div class="module-params">
+            <div class="param">
+              <span class="param-label">Intervalle</span>
+              <div class="param-bar"><div class="param-fill" style="width:90%"></div></div>
+              <span class="param-val">1 s</span>
+            </div>
+            <div class="param">
+              <span class="param-label">Priorité</span>
+              <div class="param-bar"><div class="param-fill" style="width:95%"></div></div>
+              <span class="param-val">Haute</span>
+            </div>
+          </div>
         </div>
+
+        <div class="module-card">
+          <div class="module-header">
+            <div class="module-icon icon-temp">
+              <svg viewBox="0 0 36 36" fill="none">
+                <path d="M18 6v16" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
+                <circle cx="18" cy="26" r="5" stroke="currentColor" stroke-width="2.2"/>
+                <path d="M22 10h3M22 14h2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <div>
+              <h3>Température</h3>
+              <span class="module-status active-status">Actif</span>
+            </div>
+          </div>
+          <p>Surveillance continue de la température corporelle. Déclenchement d'alerte automatique si T > 38.5°C ou T &lt; 35°C.</p>
+          <div class="module-params">
+            <div class="param">
+              <span class="param-label">Intervalle</span>
+              <div class="param-bar"><div class="param-fill" style="width:50%"></div></div>
+              <span class="param-val">15 s</span>
+            </div>
+            <div class="param">
+              <span class="param-label">Précision</span>
+              <div class="param-bar"><div class="param-fill" style="width:85%"></div></div>
+              <span class="param-val">±0.1°C</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="module-card">
+          <div class="module-header">
+            <div class="module-icon icon-bp">
+              <svg viewBox="0 0 36 36" fill="none">
+                <rect x="6" y="14" width="24" height="14" rx="4" stroke="currentColor" stroke-width="2.2"/>
+                <path d="M12 14 Q12 6 18 6 Q24 6 24 14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+                <path d="M14 21 Q16 18 18 21 Q20 24 22 21" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <div>
+              <h3>Pression Artérielle</h3>
+              <span class="module-status standby-status">Réduit</span>
+            </div>
+          </div>
+          <p>Mesure oscillométrique non-invasive. En mode réseau dégradé, seules les valeurs systolique/diastolique sont transmises (sans waveform).</p>
+          <div class="module-params">
+            <div class="param">
+              <span class="param-label">Intervalle</span>
+              <div class="param-bar"><div class="param-fill" style="width:35%"></div></div>
+              <span class="param-val">5 min</span>
+            </div>
+            <div class="param">
+              <span class="param-label">Données</span>
+              <div class="param-bar"><div class="param-fill" style="width:40%"></div></div>
+              <span class="param-val">Partiel</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="module-card">
+          <div class="module-header">
+            <div class="module-icon icon-resp">
+              <svg viewBox="0 0 36 36" fill="none">
+                <path d="M8 22 Q8 12 18 10 Q28 12 28 22" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+                <path d="M12 26 Q12 18 18 16 Q24 18 24 26" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <div>
+              <h3>Fréquence Respiratoire</h3>
+              <span class="module-status active-status">Actif</span>
+            </div>
+          </div>
+          <p>Analyse thoracique et capnographie. Détecte apnée et hyperventilation. Module suspendu automatiquement si IoT bas de gamme détecté.</p>
+          <div class="module-params">
+            <div class="param">
+              <span class="param-label">Intervalle</span>
+              <div class="param-bar"><div class="param-fill" style="width:60%"></div></div>
+              <span class="param-val">5 s</span>
+            </div>
+            <div class="param">
+              <span class="param-label">Analyse</span>
+              <div class="param-bar"><div class="param-fill" style="width:70%"></div></div>
+              <span class="param-val">Complète</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="module-card">
+          <div class="module-header">
+            <div class="module-icon icon-alert">
+              <svg viewBox="0 0 36 36" fill="none">
+                <path d="M18 4 L32 30 H4 Z" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/>
+                <path d="M18 16v6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+                <circle cx="18" cy="26" r="1.5" fill="currentColor"/>
+              </svg>
+            </div>
+            <div>
+              <h3>Moteur d'Alertes</h3>
+              <span class="module-status active-status">Actif</span>
+            </div>
+          </div>
+          <p>Agrège tous les signaux et déclenche des alertes graduées : notification SMS, appel vocal automatique, ou alarme en salle de soins.</p>
+          <div class="module-params">
+            <div class="param">
+              <span class="param-label">Latence</span>
+              <div class="param-bar"><div class="param-fill" style="width:95%"></div></div>
+              <span class="param-val">&lt;200ms</span>
+            </div>
+            <div class="param">
+              <span class="param-label">Canaux</span>
+              <div class="param-bar"><div class="param-fill" style="width:100%"></div></div>
+              <span class="param-val">3 actifs</span>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
   </section>
 
-  <!-- EDITORIAL BOARD -->
-  <section class="section" id="editorial">
+  <!-- LOGIQUE D'ADAPTATION -->
+  <section class="section" id="adaptation">
     <div class="container">
       <div class="section-header">
-        <h2>Editorial Board</h2>
-        <p>Our international panel of leading researchers ensures rigorous, unbiased peer review.</p>
+        <h2>Logique d'Adaptation en Temps Réel</h2>
+        <p>Le moteur d'adaptation croise trois variables pour reconfigurer dynamiquement les modules actifs.</p>
       </div>
-      <div class="board-grid">
 
-        <div class="board-card editor-in-chief">
-          <div class="board-avatar" style="background:var(--color-primary)">EIC</div>
-          <div class="board-info">
-            <span class="board-role">Editor-in-Chief</span>
-            <h4>Prof. Amara Diallo</h4>
-            <p>MIT – Computer Science & AI Lab</p>
+      <div class="adapt-demo">
+        <div class="adapt-controls">
+          <h3>Simulateur d'Adaptation</h3>
+          <p class="adapt-desc">Modifiez les paramètres ci-dessous pour voir comment le système réagit.</p>
+
+          <div class="control-group">
+            <label>Gravité du patient</label>
+            <div class="radio-group">
+              <label class="radio-opt">
+                <input type="radio" name="severity" value="stable" checked />
+                <span class="radio-label stable-label">Stable</span>
+              </label>
+              <label class="radio-opt">
+                <input type="radio" name="severity" value="moderate" />
+                <span class="radio-label moderate-label">Modéré</span>
+              </label>
+              <label class="radio-opt">
+                <input type="radio" name="severity" value="critical" />
+                <span class="radio-label critical-label">Critique</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <label>Qualité réseau</label>
+            <div class="radio-group">
+              <label class="radio-opt">
+                <input type="radio" name="network" value="high" checked />
+                <span class="radio-label">WiFi / 5G</span>
+              </label>
+              <label class="radio-opt">
+                <input type="radio" name="network" value="medium" />
+                <span class="radio-label">4G</span>
+              </label>
+              <label class="radio-opt">
+                <input type="radio" name="network" value="low" />
+                <span class="radio-label">Faible / Edge</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <label>Type de dispositif</label>
+            <div class="radio-group">
+              <label class="radio-opt">
+                <input type="radio" name="device" value="station" checked />
+                <span class="radio-label">Station clinique</span>
+              </label>
+              <label class="radio-opt">
+                <input type="radio" name="device" value="tablet" />
+                <span class="radio-label">Tablette</span>
+              </label>
+              <label class="radio-opt">
+                <input type="radio" name="device" value="iot" />
+                <span class="radio-label">Capteur IoT</span>
+              </label>
+            </div>
           </div>
         </div>
 
-        <div class="board-card">
-          <div class="board-avatar" style="background:#0891b2">AE</div>
-          <div class="board-info">
-            <span class="board-role">Associate Editor</span>
-            <h4>Dr. Hiroshi Tanaka</h4>
-            <p>University of Tokyo – Quantum Computing</p>
+        <div class="adapt-result" id="adaptResult">
+          <h3>Configuration Active</h3>
+          <div class="result-badge" id="resultBadge">Mode Normal</div>
+          <div class="result-modules" id="resultModules">
+            <!-- Filled by JS -->
           </div>
+          <div class="result-summary" id="resultSummary"></div>
         </div>
+      </div>
 
-        <div class="board-card">
-          <div class="board-avatar" style="background:#7c3aed">AE</div>
-          <div class="board-info">
-            <span class="board-role">Associate Editor</span>
-            <h4>Dr. Sofia Reyes</h4>
-            <p>ETH Zürich – Biomedical Engineering</p>
-          </div>
+      <!-- Tableau des règles -->
+      <div class="rules-table-wrap">
+        <h3>Matrice de Décision</h3>
+        <div class="rules-table-scroll">
+          <table class="rules-table">
+            <thead>
+              <tr>
+                <th>Gravité</th>
+                <th>Réseau</th>
+                <th>Dispositif</th>
+                <th>ECG</th>
+                <th>SpO₂</th>
+                <th>Pression</th>
+                <th>Resp.</th>
+                <th>Alertes</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="level stable">Stable</span></td>
+                <td>Haut</td>
+                <td>Tout</td>
+                <td class="td-on">250 Hz</td>
+                <td class="td-on">30 s</td>
+                <td class="td-on">5 min</td>
+                <td class="td-on">15 s</td>
+                <td class="td-on">SMS</td>
+              </tr>
+              <tr>
+                <td><span class="level moderate">Modéré</span></td>
+                <td>Moyen</td>
+                <td>Tablette+</td>
+                <td class="td-on">400 Hz</td>
+                <td class="td-on">5 s</td>
+                <td class="td-on">2 min</td>
+                <td class="td-on">5 s</td>
+                <td class="td-warn">SMS+Appel</td>
+              </tr>
+              <tr class="row-critical">
+                <td><span class="level critical">Critique</span></td>
+                <td>Tout</td>
+                <td>Tout</td>
+                <td class="td-on">500 Hz</td>
+                <td class="td-on">1 s</td>
+                <td class="td-on">30 s</td>
+                <td class="td-on">1 s</td>
+                <td class="td-crit">Alarme salle</td>
+              </tr>
+              <tr>
+                <td><span class="level stable">Stable</span></td>
+                <td>Faible</td>
+                <td>IoT</td>
+                <td class="td-reduced">125 Hz</td>
+                <td class="td-on">60 s</td>
+                <td class="td-off">Suspendu</td>
+                <td class="td-off">Suspendu</td>
+                <td class="td-on">SMS</td>
+              </tr>
+              <tr class="row-critical">
+                <td><span class="level critical">Critique</span></td>
+                <td>Faible</td>
+                <td>IoT</td>
+                <td class="td-on">250 Hz*</td>
+                <td class="td-on">1 s</td>
+                <td class="td-reduced">Partiel</td>
+                <td class="td-off">Suspendu</td>
+                <td class="td-crit">Alarme max</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
-
-        <div class="board-card">
-          <div class="board-avatar" style="background:#059669">AE</div>
-          <div class="board-info">
-            <span class="board-role">Associate Editor</span>
-            <h4>Prof. Kwame Asante</h4>
-            <p>Univ. of Cape Town – Environmental Science</p>
-          </div>
-        </div>
-
-        <div class="board-card">
-          <div class="board-avatar" style="background:#dc2626">AE</div>
-          <div class="board-info">
-            <span class="board-role">Associate Editor</span>
-            <h4>Dr. Irina Volkov</h4>
-            <p>INRIA Paris – Distributed Systems</p>
-          </div>
-        </div>
-
-        <div class="board-card">
-          <div class="board-avatar" style="background:#d97706">AE</div>
-          <div class="board-info">
-            <span class="board-role">Associate Editor</span>
-            <h4>Prof. Lena Andersen</h4>
-            <p>Karolinska Institute – Genomics</p>
-          </div>
-        </div>
-
+        <p class="table-note">* Compression maximale activée pour compenser la faible bande passante.</p>
       </div>
     </div>
   </section>
 
-  <!-- SUBMIT -->
-  <section class="section section-alt" id="submit">
+  <!-- ARCHITECTURE -->
+  <section class="section section-alt" id="architecture">
     <div class="container">
-      <div class="submit-grid">
-        <div class="submit-info">
-          <h2>Submit Your Research</h2>
-          <p>nfoLab welcomes original research articles, review papers, and short communications. All submissions undergo double-blind peer review.</p>
-          <ul class="submit-checklist">
-            <li>&#10003; Double-blind peer review within 6 weeks</li>
-            <li>&#10003; Open access — free to read worldwide</li>
-            <li>&#10003; DOI assigned to every article</li>
-            <li>&#10003; Indexed in Scopus, Web of Science & DOAJ</li>
-            <li>&#10003; No article processing charge (APC waiver available)</li>
-          </ul>
-          <a href="#" class="btn btn-primary">Author Guidelines</a>
+      <div class="section-header">
+        <h2>Architecture Technique</h2>
+        <p>Une pile technologique en trois couches conçue pour la résilience et l'adaptabilité.</p>
+      </div>
+
+      <div class="arch-layers">
+
+        <div class="arch-layer layer-edge">
+          <div class="layer-label">Couche Edge</div>
+          <div class="layer-cards">
+            <div class="arch-card">
+              <span class="arch-icon">&#128268;</span>
+              <strong>Capteurs BLE / ZigBee</strong>
+              <p>ECG, SpO₂, température, pression — protocoles basse consommation</p>
+            </div>
+            <div class="arch-card">
+              <span class="arch-icon">&#9881;</span>
+              <strong>Agent Local (Edge AI)</strong>
+              <p>Prétraitement sur l'appareil, détection d'anomalies hors ligne</p>
+            </div>
+            <div class="arch-card">
+              <span class="arch-icon">&#128246;</span>
+              <strong>Gateway Réseau</strong>
+              <p>WiFi / 4G / 5G — bascule automatique selon disponibilité</p>
+            </div>
+          </div>
         </div>
-        <div class="submit-form-wrap">
-          <form class="submit-form" id="submitForm">
-            <h3>Manuscript Inquiry</h3>
-            <div class="form-group">
-              <label for="authorName">Corresponding Author</label>
-              <input type="text" id="authorName" placeholder="Full name" required />
+
+        <div class="layer-arrow">&#8595;</div>
+
+        <div class="arch-layer layer-platform">
+          <div class="layer-label">Couche Plateforme</div>
+          <div class="layer-cards">
+            <div class="arch-card">
+              <span class="arch-icon">&#9873;</span>
+              <strong>Moteur d'Adaptation</strong>
+              <p>Règles métier + modèle ML pour classification de la gravité</p>
             </div>
-            <div class="form-group">
-              <label for="authorEmail">Email Address</label>
-              <input type="email" id="authorEmail" placeholder="your@institution.edu" required />
+            <div class="arch-card">
+              <span class="arch-icon">&#128202;</span>
+              <strong>Stream Processing</strong>
+              <p>Apache Kafka + Flink pour traitement temps-réel des flux capteurs</p>
             </div>
-            <div class="form-group">
-              <label for="manuscriptTitle">Manuscript Title</label>
-              <input type="text" id="manuscriptTitle" placeholder="Working title of your paper" required />
+            <div class="arch-card">
+              <span class="arch-icon">&#128274;</span>
+              <strong>Sécurité & Conformité</strong>
+              <p>Chiffrement TLS 1.3, RGPD, HL7 FHIR pour interopérabilité</p>
             </div>
-            <div class="form-group">
-              <label for="researchArea">Research Area</label>
-              <select id="researchArea">
-                <option value="">Select area...</option>
-                <option>Computer Science</option>
-                <option>Biomedical Engineering</option>
-                <option>Data Systems</option>
-                <option>Environmental Science</option>
-                <option>Interdisciplinary</option>
-                <option>Other</option>
-              </select>
+          </div>
+        </div>
+
+        <div class="layer-arrow">&#8595;</div>
+
+        <div class="arch-layer layer-presentation">
+          <div class="layer-label">Couche Présentation</div>
+          <div class="layer-cards">
+            <div class="arch-card">
+              <span class="arch-icon">&#128187;</span>
+              <strong>Dashboard Clinicien</strong>
+              <p>Vue temps-réel multi-patients, alertes graduées, historique</p>
             </div>
-            <div class="form-group">
-              <label for="abstract">Brief Abstract (250 words max)</label>
-              <textarea id="abstract" rows="4" placeholder="Summarize your key findings..."></textarea>
+            <div class="arch-card">
+              <span class="arch-icon">&#128241;</span>
+              <strong>App Mobile Patient</strong>
+              <p>Interface simplifiée, retour d'état, communication médecin</p>
             </div>
-            <button type="submit" class="btn btn-primary" style="width:100%">Send Inquiry</button>
-            <p class="form-note">Full submission portal link will be sent to your email within 24 hours.</p>
-          </form>
+            <div class="arch-card">
+              <span class="arch-icon">&#128203;</span>
+              <strong>Dossier Médical</strong>
+              <p>Export automatique vers le DMP, intégration HIS hospitalier</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Stack technique -->
+      <div class="tech-stack">
+        <h3>Stack Technologique</h3>
+        <div class="stack-grid">
+          <div class="stack-item"><span class="stack-cat">Backend</span><span>Python · FastAPI · Kafka</span></div>
+          <div class="stack-item"><span class="stack-cat">Stream</span><span>Apache Flink · Redis Streams</span></div>
+          <div class="stack-item"><span class="stack-cat">IA/ML</span><span>TensorFlow Lite · ONNX</span></div>
+          <div class="stack-item"><span class="stack-cat">Base de données</span><span>TimescaleDB · MongoDB</span></div>
+          <div class="stack-item"><span class="stack-cat">DevOps</span><span>Kubernetes · Docker · CI/CD</span></div>
+          <div class="stack-item"><span class="stack-cat">Sécurité</span><span>OAuth 2.0 · HL7 FHIR · TLS 1.3</span></div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- ABOUT -->
-  <section class="section" id="about">
+  <!-- RÉSULTATS -->
+  <section class="section" id="resultats">
     <div class="container">
-      <div class="about-grid">
-        <div>
-          <h2>About nfoLab</h2>
-          <p>Founded in 2014, <strong>Ai Medical InFo – Journal of Scientific Research</strong> is an open-access, peer-reviewed publication dedicated to disseminating cutting-edge science across disciplines. We believe knowledge should be freely available to all, regardless of institutional affiliation.</p>
-          <p>Our editorial team is committed to rigorous methodology, reproducibility, and transparency. All published datasets and code are required to be publicly archived.</p>
-          <div class="about-metrics">
-            <div class="metric">
-              <span class="metric-val">6 weeks</span>
-              <span class="metric-label">Average review time</span>
-            </div>
-            <div class="metric">
-              <span class="metric-val">72%</span>
-              <span class="metric-label">Acceptance of invited revisions</span>
-            </div>
-            <div class="metric">
-              <span class="metric-val">18%</span>
-              <span class="metric-label">Overall acceptance rate</span>
-            </div>
-          </div>
-        </div>
-        <div class="about-aside">
-          <div class="about-card">
-            <h4>Indexing & Abstracting</h4>
-            <ul>
-              <li>Scopus</li>
-              <li>Web of Science (ESCI)</li>
-              <li>Directory of Open Access Journals (DOAJ)</li>
-              <li>PubMed Central (PMC)</li>
-              <li>Google Scholar</li>
-              <li>CrossRef</li>
-            </ul>
-          </div>
-          <div class="about-card">
-            <h4>ISSN</h4>
-            <p>Print: 2345-6789 &nbsp;|&nbsp; Online: 2345-6790</p>
-            <h4 style="margin-top:1rem">Publisher</h4>
-            <p>nfoLab Scientific Publishing, Inc.<br />Open Science Division</p>
-          </div>
-        </div>
+      <div class="section-header">
+        <h2>Résultats & Performances</h2>
+        <p>Évaluation sur un déploiement pilote de 6 mois dans deux établissements hospitaliers.</p>
       </div>
-    </div>
-  </section>
 
-  <!-- NEWSLETTER -->
-  <section class="newsletter-section">
-    <div class="container newsletter-inner">
-      <div>
-        <h3>Stay Up to Date</h3>
-        <p>Get the latest articles and journal news delivered to your inbox.</p>
+      <div class="results-grid">
+        <div class="result-card rc-primary">
+          <div class="rc-number">94.7%</div>
+          <div class="rc-label">Précision de détection des anomalies critiques</div>
+        </div>
+        <div class="result-card">
+          <div class="rc-number">&#8722;63%</div>
+          <div class="rc-label">Réduction de la bande passante utilisée (mode dégradé)</div>
+        </div>
+        <div class="result-card">
+          <div class="rc-number">&lt;200ms</div>
+          <div class="rc-label">Latence de déclenchement d'alerte critique</div>
+        </div>
+        <div class="result-card">
+          <div class="rc-number">99.8%</div>
+          <div class="rc-label">Disponibilité de la plateforme (uptime annuel)</div>
+        </div>
+        <div class="result-card">
+          <div class="rc-number">&#8722;41%</div>
+          <div class="rc-label">Réduction des fausses alertes grâce à l'adaptation contextuelle</div>
+        </div>
+        <div class="result-card">
+          <div class="rc-number">3×</div>
+          <div class="rc-label">Augmentation de la capacité de surveillance simultanée</div>
+        </div>
       </div>
-      <form class="newsletter-form" id="newsletterForm">
-        <input type="email" placeholder="Enter your email address" required />
-        <button type="submit" class="btn btn-primary">Subscribe</button>
-      </form>
+
+      <div class="conclusion-box">
+        <h3>Conclusion de l'Étude</h3>
+        <p>
+          La plateforme démontre qu'une approche adaptative basée sur le contexte (gravité, réseau, dispositif)
+          permet de maintenir une qualité de soins optimale même dans des conditions réseau dégradées ou
+          sur des équipements hétérogènes. L'intégration du traitement temps-réel par flux de données
+          (<em>stream processing</em>) combinée à des modèles ML embarqués ouvre la voie à une télémédecine
+          résiliente et accessible dans des environnements à ressources limitées.
+        </p>
+        <div class="conclusion-tags">
+          <span>e-Santé</span>
+          <span>IoT Médical</span>
+          <span>Adaptation dynamique</span>
+          <span>Temps réel</span>
+          <span>HL7 FHIR</span>
+          <span>Edge AI</span>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -423,40 +663,38 @@
   <footer class="site-footer">
     <div class="container footer-inner">
       <div class="footer-brand">
-        <span class="logo-name" style="font-size:1.4rem">Ai Medical InFo</span>
-        <p>Journal of Scientific Research<br />Open Access · Peer-Reviewed · Since 2014</p>
+        <span class="logo-name" style="font-size:1.3rem">Ai Medical InFo</span>
+        <p>Plateforme e-Santé Adaptative<br />Cas d'étude — Surveillance à distance de patients</p>
       </div>
       <div class="footer-links">
-        <h5>Journal</h5>
+        <h5>Navigation</h5>
         <ul>
-          <li><a href="#articles">Articles</a></li>
-          <li><a href="#issues">Issues</a></li>
-          <li><a href="#editorial">Editorial Board</a></li>
-          <li><a href="#submit">Submit Manuscript</a></li>
+          <li><a href="#systeme">Système</a></li>
+          <li><a href="#modules">Modules</a></li>
+          <li><a href="#adaptation">Adaptation</a></li>
+          <li><a href="#architecture">Architecture</a></li>
         </ul>
       </div>
       <div class="footer-links">
-        <h5>Policies</h5>
+        <h5>Standards</h5>
         <ul>
-          <li><a href="#">Open Access Policy</a></li>
-          <li><a href="#">Peer Review Process</a></li>
-          <li><a href="#">Ethics &amp; Misconduct</a></li>
-          <li><a href="#">Copyright &amp; Licensing</a></li>
+          <li><a href="#">HL7 FHIR R4</a></li>
+          <li><a href="#">IEC 62304</a></li>
+          <li><a href="#">ISO 13485</a></li>
+          <li><a href="#">RGPD / HIPAA</a></li>
         </ul>
       </div>
       <div class="footer-links">
         <h5>Contact</h5>
         <ul>
-          <li><a href="mailto:editor@aimedicalinfo.org">editor@aimedicalinfo.org</a></li>
-          <li><a href="mailto:submissions@aimedicalinfo.org">submissions@aimedicalinfo.org</a></li>
-          <li><a href="#">Twitter / X</a></li>
-          <li><a href="#">LinkedIn</a></li>
+          <li><a href="mailto:contact@aimedicalinfo.org">contact@aimedicalinfo.org</a></li>
+          <li><a href="mailto:research@aimedicalinfo.org">research@aimedicalinfo.org</a></li>
         </ul>
       </div>
     </div>
     <div class="footer-bottom">
       <div class="container">
-        <p>&copy; 2026 Ai Medical InFo Scientific Publishing. All articles published under <a href="#">CC BY 4.0</a>.</p>
+        <p>&copy; 2026 Ai Medical InFo — Plateforme e-Santé. Tous droits réservés.</p>
       </div>
     </div>
   </footer>
