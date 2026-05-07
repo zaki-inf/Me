@@ -3,328 +3,416 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Scénario Complet — Ai Medical InFo</title>
-  <link rel="stylesheet" href="style.css"/>
+  <title>Scénario Adaptatif — Ai Medical InFo</title>
   <link rel="stylesheet" href="scenario.css"/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
 </head>
-<body class="scenario-body">
+<body>
 
-  <!-- TOP BAR -->
-  <header class="scen-header">
-    <div class="scen-header-inner">
-      <div class="scen-logo">
-        <svg viewBox="0 0 40 40" fill="none" class="scen-logo-svg">
-          <circle cx="20" cy="20" r="18" stroke="#38bdf8" stroke-width="2"/>
-          <path d="M6 20h5l3-7 4 14 4-10 3 3h9" stroke="#38bdf8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-        <div>
-          <span class="scen-logo-name">Ai Medical InFo</span>
-          <span class="scen-logo-sub">Scénario Complet — Pipeline e-Santé</span>
-        </div>
-      </div>
-      <div class="scen-header-right">
-        <div class="scen-clock" id="scenClock">--:--:--</div>
-        <div class="sim-status" id="simStatus">
-          <span class="sim-dot idle"></span>
-          <span id="simStatusText">Prêt</span>
-        </div>
-        <button class="btn-start" id="btnStart" onclick="startSimulation()">▶ Lancer le scénario</button>
-        <button class="btn-stop" id="btnStop" onclick="stopSimulation()" disabled>⏹ Arrêter</button>
-        <a href="index.html" class="btn-back">← Retour</a>
+<!-- ═══════════════ HEADER ═══════════════ -->
+<header class="sc-header">
+  <div class="sc-header-inner">
+    <div class="sc-logo">
+      <svg viewBox="0 0 40 40" fill="none" width="34" height="34">
+        <circle cx="20" cy="20" r="18" stroke="#38bdf8" stroke-width="2"/>
+        <path d="M6 20h5l3-7 4 14 4-10 3 3h9" stroke="#38bdf8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <div>
+        <div class="sc-logo-name">Ai Medical InFo</div>
+        <div class="sc-logo-sub">Système adaptatif e-Santé — Démonstration du cycle de décision</div>
       </div>
     </div>
-  </header>
+    <div class="sc-header-right">
+      <div class="sc-clock" id="scClock">--:--:--</div>
+      <div class="sim-badge" id="simBadge"><span class="sim-dot idle"></span><span id="simLabel">Prêt</span></div>
+      <button class="btn-run"  id="btnRun"  onclick="startSim()">▶ Lancer</button>
+      <button class="btn-stop" id="btnStop" onclick="stopSim()" disabled>⏹ Arrêter</button>
+      <button class="btn-step" id="btnStep" onclick="stepOnce()">⏭ Étape par étape</button>
+      <a href="index.html" class="btn-back">← Retour</a>
+    </div>
+  </div>
+</header>
 
-  <!-- SCENARIO LEGEND -->
-  <div class="scenario-legend">
-    <div class="legend-title">Sélectionner l'état du patient :</div>
-    <button class="leg-btn leg-stable  active" onclick="setState('stable')"  id="btnStable">🟢 Stable</button>
-    <button class="leg-btn leg-moderate"       onclick="setState('moderate')" id="btnModerate">🟡 Modéré</button>
-    <button class="leg-btn leg-critical"       onclick="setState('critical')" id="btnCritical">🔴 Critique</button>
-    <div class="legend-sep"></div>
-    <div class="legend-info" id="legendInfo">Cliquez sur <strong>Lancer le scénario</strong> pour démarrer la simulation.</div>
+<!-- ═══════════════ CONTEXT SELECTORS ═══════════════ -->
+<div class="context-bar">
+  <div class="ctx-group">
+    <span class="ctx-label">Patient</span>
+    <button class="ctx-btn ctx-stable   active" data-ctx="severity" data-val="stable"   onclick="setCtx(this,'severity','stable')">🟢 Stable</button>
+    <button class="ctx-btn ctx-moderate"        data-ctx="severity" data-val="moderate" onclick="setCtx(this,'severity','moderate')">🟡 Modéré</button>
+    <button class="ctx-btn ctx-critical"        data-ctx="severity" data-val="critical" onclick="setCtx(this,'severity','critical')">🔴 Critique</button>
+  </div>
+  <div class="ctx-sep"></div>
+  <div class="ctx-group">
+    <span class="ctx-label">Réseau</span>
+    <button class="ctx-btn ctx-high   active" data-ctx="network" data-val="high"   onclick="setCtx(this,'network','high')">📶 WiFi/5G</button>
+    <button class="ctx-btn ctx-medium"        data-ctx="network" data-val="medium" onclick="setCtx(this,'network','medium')">📶 4G</button>
+    <button class="ctx-btn ctx-low"           data-ctx="network" data-val="low"    onclick="setCtx(this,'network','low')">📡 Dégradé</button>
+  </div>
+  <div class="ctx-sep"></div>
+  <div class="ctx-group">
+    <span class="ctx-label">Dispositif</span>
+    <button class="ctx-btn ctx-high   active" data-ctx="device" data-val="station" onclick="setCtx(this,'device','station')">🖥️ Station</button>
+    <button class="ctx-btn ctx-medium"        data-ctx="device" data-val="tablet"  onclick="setCtx(this,'device','tablet')">📱 Tablette</button>
+    <button class="ctx-btn ctx-low"           data-ctx="device" data-val="iot"     onclick="setCtx(this,'device','iot')">📡 IoT</button>
+  </div>
+  <div class="ctx-sep"></div>
+  <div class="ctx-summary" id="ctxSummary">Situation : <strong>Normale</strong></div>
+</div>
+
+<!-- ═══════════════ 5-STEP PIPELINE ═══════════════ -->
+<div class="pipeline-bar">
+
+  <!-- STEP 1 -->
+  <div class="pipe-step" id="pstep-1">
+    <div class="pipe-num">01</div>
+    <div class="pipe-icon-wrap"><span class="pipe-icon">🎯</span></div>
+    <div class="pipe-title">Objectif</div>
+    <div class="pipe-sub">Définir les buts</div>
+    <div class="pipe-progress" id="pp-1"><div class="pipe-fill" id="pf-1"></div></div>
   </div>
 
-  <!-- MAIN LAYOUT -->
-  <div class="scenario-main">
+  <div class="pipe-connector" id="conn-1">
+    <div class="conn-line"><div class="conn-packet" id="cpkt-1"></div></div>
+    <svg width="10" height="14" viewBox="0 0 10 14"><polygon points="0,0 10,7 0,14" fill="#334155"/></svg>
+  </div>
 
-    <!-- ═══ COLONNE GAUCHE : Patient + Capteur ═══ -->
-    <div class="scen-col scen-col-left">
+  <!-- STEP 2 -->
+  <div class="pipe-step" id="pstep-2">
+    <div class="pipe-num">02</div>
+    <div class="pipe-icon-wrap"><span class="pipe-icon">📊</span></div>
+    <div class="pipe-title">Métrique</div>
+    <div class="pipe-sub">Mesurer le contexte</div>
+    <div class="pipe-progress" id="pp-2"><div class="pipe-fill" id="pf-2"></div></div>
+  </div>
 
-      <!-- PATIENT -->
-      <div class="scen-card" id="card-patient">
-        <div class="card-header">
-          <span class="card-icon">👤</span>
-          <div>
-            <div class="card-title">Patient</div>
-            <div class="card-sub">Ahmed Benali — ID: P-0042</div>
+  <div class="pipe-connector" id="conn-2">
+    <div class="conn-line"><div class="conn-packet" id="cpkt-2"></div></div>
+    <svg width="10" height="14" viewBox="0 0 10 14"><polygon points="0,0 10,7 0,14" fill="#334155"/></svg>
+  </div>
+
+  <!-- STEP 3 -->
+  <div class="pipe-step" id="pstep-3">
+    <div class="pipe-num">03</div>
+    <div class="pipe-icon-wrap"><span class="pipe-icon">🔍</span></div>
+    <div class="pipe-title">Situation</div>
+    <div class="pipe-sub">Évaluer l'état global</div>
+    <div class="pipe-progress" id="pp-3"><div class="pipe-fill" id="pf-3"></div></div>
+  </div>
+
+  <div class="pipe-connector" id="conn-3">
+    <div class="conn-line"><div class="conn-packet" id="cpkt-3"></div></div>
+    <svg width="10" height="14" viewBox="0 0 10 14"><polygon points="0,0 10,7 0,14" fill="#334155"/></svg>
+  </div>
+
+  <!-- STEP 4 -->
+  <div class="pipe-step" id="pstep-4">
+    <div class="pipe-num">04</div>
+    <div class="pipe-icon-wrap"><span class="pipe-icon">⚖️</span></div>
+    <div class="pipe-title">Décision</div>
+    <div class="pipe-sub">Sélectionner la règle</div>
+    <div class="pipe-progress" id="pp-4"><div class="pipe-fill" id="pf-4"></div></div>
+  </div>
+
+  <div class="pipe-connector" id="conn-4">
+    <div class="conn-line"><div class="conn-packet" id="cpkt-4"></div></div>
+    <svg width="10" height="14" viewBox="0 0 10 14"><polygon points="0,0 10,7 0,14" fill="#334155"/></svg>
+  </div>
+
+  <!-- STEP 5 -->
+  <div class="pipe-step" id="pstep-5">
+    <div class="pipe-num">05</div>
+    <div class="pipe-icon-wrap"><span class="pipe-icon">⚡</span></div>
+    <div class="pipe-title">Adaptation</div>
+    <div class="pipe-sub">Appliquer la config</div>
+    <div class="pipe-progress" id="pp-5"><div class="pipe-fill" id="pf-5"></div></div>
+  </div>
+
+</div><!-- end pipeline-bar -->
+
+<!-- ═══════════════ MAIN CONTENT (5 panels) ═══════════════ -->
+<div class="sc-main">
+
+  <!-- ── PANEL 1 : OBJECTIF ── -->
+  <div class="sc-panel" id="panel-1">
+    <div class="panel-head">
+      <span class="panel-step-badge">01</span>
+      <div>
+        <div class="panel-title">🎯 Objectif</div>
+        <div class="panel-desc">Définir ce que le système doit garantir en toutes circonstances.</div>
+      </div>
+    </div>
+    <div class="panel-body">
+      <div class="obj-main" id="objMain">
+        <div class="obj-quote" id="objQuote">
+          "Assurer une surveillance médicale continue, adaptée à l'état du patient, à la qualité du réseau et aux capacités du dispositif."
+        </div>
+      </div>
+      <div class="obj-grid">
+        <div class="obj-card" id="obj-clinical">
+          <div class="obj-icon">❤️</div>
+          <div class="obj-label">Objectif clinique</div>
+          <div class="obj-val" id="obj-clinical-val">Détection précoce des anomalies vitales</div>
+          <div class="obj-kpi" id="obj-clinical-kpi">Seuil : SpO₂ &lt; 90% → Critique</div>
+        </div>
+        <div class="obj-card" id="obj-network">
+          <div class="obj-icon">📡</div>
+          <div class="obj-label">Objectif réseau</div>
+          <div class="obj-val" id="obj-network-val">Maintenir la transmission des données vitales</div>
+          <div class="obj-kpi" id="obj-network-kpi">Bande passante min : 64 Kbps</div>
+        </div>
+        <div class="obj-card" id="obj-device">
+          <div class="obj-icon">🔋</div>
+          <div class="obj-label">Objectif dispositif</div>
+          <div class="obj-val" id="obj-device-val">Adapter la charge de traitement au matériel</div>
+          <div class="obj-kpi" id="obj-device-kpi">IoT : max 2 modules simultanés</div>
+        </div>
+      </div>
+      <div class="obj-priority" id="objPriority">
+        <span class="opp-label">Priorité actuelle :</span>
+        <span class="opp-val" id="oppVal">En attente de simulation...</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── PANEL 2 : MÉTRIQUE ── -->
+  <div class="sc-panel" id="panel-2">
+    <div class="panel-head">
+      <span class="panel-step-badge">02</span>
+      <div>
+        <div class="panel-title">📊 Métrique</div>
+        <div class="panel-desc">Collecter et mesurer toutes les variables cliniques et contextuelles.</div>
+      </div>
+    </div>
+    <div class="panel-body">
+      <div class="metric-sections">
+
+        <div class="metric-section">
+          <div class="ms-title">🩺 Métriques cliniques</div>
+          <div class="metric-grid">
+            <div class="metric-box" id="met-hr">
+              <div class="mb-label">Fréquence cardiaque</div>
+              <div class="mb-val" id="mv-hr">--</div>
+              <div class="mb-unit">bpm</div>
+              <div class="mb-bar"><div class="mb-fill" id="mf-hr"></div></div>
+              <div class="mb-ref">Normale : 60–100</div>
+            </div>
+            <div class="metric-box" id="met-spo2">
+              <div class="mb-label">Saturation SpO₂</div>
+              <div class="mb-val" id="mv-spo2">--</div>
+              <div class="mb-unit">%</div>
+              <div class="mb-bar"><div class="mb-fill" id="mf-spo2"></div></div>
+              <div class="mb-ref">Normale : ≥ 95%</div>
+            </div>
+            <div class="metric-box" id="met-temp">
+              <div class="mb-label">Température</div>
+              <div class="mb-val" id="mv-temp">--</div>
+              <div class="mb-unit">°C</div>
+              <div class="mb-bar"><div class="mb-fill" id="mf-temp"></div></div>
+              <div class="mb-ref">Normale : 36.1–37.2</div>
+            </div>
+            <div class="metric-box" id="met-bp">
+              <div class="mb-label">Pression artérielle</div>
+              <div class="mb-val" id="mv-bp" style="font-size:1rem">--/--</div>
+              <div class="mb-unit">mmHg</div>
+              <div class="mb-bar"><div class="mb-fill" id="mf-bp"></div></div>
+              <div class="mb-ref">Normale : 120/80</div>
+            </div>
+            <div class="metric-box" id="met-resp">
+              <div class="mb-label">Fr. respiratoire</div>
+              <div class="mb-val" id="mv-resp">--</div>
+              <div class="mb-unit">resp/min</div>
+              <div class="mb-bar"><div class="mb-fill" id="mf-resp"></div></div>
+              <div class="mb-ref">Normale : 12–20</div>
+            </div>
+            <div class="metric-box" id="met-score">
+              <div class="mb-label">Score clinique</div>
+              <div class="mb-val" id="mv-score">--</div>
+              <div class="mb-unit">/ 10</div>
+              <div class="mb-bar"><div class="mb-fill" id="mf-score"></div></div>
+              <div class="mb-ref">Seuil critique : ≥ 7</div>
+            </div>
           </div>
-          <div class="card-status" id="status-patient">En attente</div>
-        </div>
-        <div class="patient-info">
-          <div class="pi-row"><span>Âge</span><strong>38 ans</strong></div>
-          <div class="pi-row"><span>Pathologie</span><strong>Suivi post-op</strong></div>
-          <div class="pi-row"><span>Dispositif</span><strong>IoT BLE v2</strong></div>
-          <div class="pi-row"><span>Réseau</span><strong id="networkType">WiFi 5G</strong></div>
         </div>
 
-        <!-- ECG WAVEFORM -->
-        <div class="ecg-container">
-          <div class="ecg-label">ECG en direct</div>
-          <svg class="ecg-svg" id="ecgSvg" viewBox="0 0 500 80" preserveAspectRatio="none">
-            <rect width="500" height="80" fill="#0a1628"/>
-            <!-- Grid -->
-            <line x1="0" y1="20" x2="500" y2="20" stroke="#1e3a5f" stroke-width="0.5"/>
-            <line x1="0" y1="40" x2="500" y2="40" stroke="#1e3a5f" stroke-width="1"/>
-            <line x1="0" y1="60" x2="500" y2="60" stroke="#1e3a5f" stroke-width="0.5"/>
-            <line x1="100" y1="0" x2="100" y2="80" stroke="#1e3a5f" stroke-width="0.5"/>
-            <line x1="200" y1="0" x2="200" y2="80" stroke="#1e3a5f" stroke-width="0.5"/>
-            <line x1="300" y1="0" x2="300" y2="80" stroke="#1e3a5f" stroke-width="0.5"/>
-            <line x1="400" y1="0" x2="400" y2="80" stroke="#1e3a5f" stroke-width="0.5"/>
-            <polyline id="ecgPath" fill="none" stroke="#00ff88" stroke-width="1.8"
-              points="0,40 30,40 45,40 52,10 57,70 64,40 90,40 120,40 135,40 142,12 147,68 154,40 180,40 210,40 225,40 232,10 237,70 244,40 270,40 300,40 315,40 322,12 327,68 334,40 360,40 390,40 405,40 412,10 417,70 424,40 450,40 480,40 495,40"/>
-          </svg>
-          <div class="ecg-metrics" id="ecgMetrics">
-            <span>HR: <strong id="liveHR">--</strong> bpm</span>
-            <span>SpO₂: <strong id="liveSPO2">--</strong>%</span>
-            <span>Temp: <strong id="liveTemp">--</strong>°C</span>
+        <div class="metric-section">
+          <div class="ms-title">🌐 Métriques contextuelles</div>
+          <div class="ctx-metric-grid">
+            <div class="ctx-met-card" id="ctxm-net">
+              <div class="cmm-icon">📶</div>
+              <div class="cmm-label">Réseau</div>
+              <div class="cmm-val" id="cmv-net">--</div>
+              <div class="cmm-sub" id="cms-net">--</div>
+            </div>
+            <div class="ctx-met-card" id="ctxm-dev">
+              <div class="cmm-icon">💻</div>
+              <div class="cmm-label">Dispositif</div>
+              <div class="cmm-val" id="cmv-dev">--</div>
+              <div class="cmm-sub" id="cms-dev">--</div>
+            </div>
+            <div class="ctx-met-card" id="ctxm-bw">
+              <div class="cmm-icon">⬆️</div>
+              <div class="cmm-label">Bande passante</div>
+              <div class="cmm-val" id="cmv-bw">--</div>
+              <div class="cmm-sub" id="cms-bw">Kbps</div>
+            </div>
+            <div class="ctx-met-card" id="ctxm-cpu">
+              <div class="cmm-icon">⚙️</div>
+              <div class="cmm-label">CPU disponible</div>
+              <div class="cmm-val" id="cmv-cpu">--</div>
+              <div class="cmm-sub">%</div>
+            </div>
           </div>
         </div>
 
-        <div class="packet-preview" id="packetPreview">
-          <div class="pp-label">📦 Paquet ECG généré</div>
-          <pre id="packetJson" class="pp-json">En attente...</pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── PANEL 3 : SITUATION ── -->
+  <div class="sc-panel" id="panel-3">
+    <div class="panel-head">
+      <span class="panel-step-badge">03</span>
+      <div>
+        <div class="panel-title">🔍 Situation</div>
+        <div class="panel-desc">Croiser les métriques pour classifier la situation globale.</div>
+      </div>
+    </div>
+    <div class="panel-body">
+
+      <div class="situation-global" id="sitGlobal">
+        <div class="sg-label">Situation globale détectée</div>
+        <div class="sg-name" id="sgName">—</div>
+        <div class="sg-desc" id="sgDesc">En attente des métriques...</div>
+      </div>
+
+      <div class="situation-matrix">
+        <div class="sm-title">Analyse multicritère</div>
+        <div class="sm-rows">
+          <div class="sm-row">
+            <span class="sm-dim">État clinique</span>
+            <div class="sm-bar-wrap"><div class="sm-bar" id="smb-clinical"><div class="sm-fill" id="smf-clinical"></div></div></div>
+            <span class="sm-result" id="smr-clinical">—</span>
+          </div>
+          <div class="sm-row">
+            <span class="sm-dim">Qualité réseau</span>
+            <div class="sm-bar-wrap"><div class="sm-bar" id="smb-network"><div class="sm-fill" id="smf-network"></div></div></div>
+            <span class="sm-result" id="smr-network">—</span>
+          </div>
+          <div class="sm-row">
+            <span class="sm-dim">Capacité dispositif</span>
+            <div class="sm-bar-wrap"><div class="sm-bar" id="smb-device"><div class="sm-fill" id="smf-device"></div></div></div>
+            <span class="sm-result" id="smr-device">—</span>
+          </div>
+          <div class="sm-row sm-row-total">
+            <span class="sm-dim">Score combiné</span>
+            <div class="sm-bar-wrap"><div class="sm-bar" id="smb-total"><div class="sm-fill" id="smf-total"></div></div></div>
+            <span class="sm-result" id="smr-total">—</span>
+          </div>
         </div>
       </div>
 
-      <!-- CAPTEUR / GATEWAY -->
-      <div class="scen-card" id="card-gateway">
-        <div class="card-header">
-          <span class="card-icon">📡</span>
-          <div>
-            <div class="card-title">Capteur BLE + Gateway</div>
-            <div class="card-sub">Protocole : BLE → WiFi → HTTPS</div>
-          </div>
-          <div class="card-status" id="status-gateway">Inactif</div>
-        </div>
-        <div class="gateway-info">
-          <div class="gw-row">
-            <span class="gw-key">Protocole sortant</span>
-            <span class="gw-val">HTTPS/TLS 1.3</span>
-          </div>
-          <div class="gw-row">
-            <span class="gw-key">Endpoint cible</span>
-            <span class="gw-val mono">POST /api/v1/ecg</span>
-          </div>
-          <div class="gw-row">
-            <span class="gw-key">Compression</span>
-            <span class="gw-val" id="compressionLevel">Standard</span>
-          </div>
-          <div class="gw-row">
-            <span class="gw-key">Fréquence ECG</span>
-            <span class="gw-val" id="ecgFreq">250 Hz</span>
-          </div>
-          <div class="gw-row">
-            <span class="gw-key">Paquets envoyés</span>
-            <span class="gw-val" id="packetCount">0</span>
-          </div>
-        </div>
-        <div class="send-indicator" id="sendIndicator">
-          <div class="send-dot"></div>
-          <span>Transmission en cours...</span>
-        </div>
+      <div class="situation-flags" id="sitFlags">
+        <!-- filled by JS -->
       </div>
 
     </div>
+  </div>
 
-    <!-- ═══ CENTRE : Pipeline animé ═══ -->
-    <div class="scen-col scen-col-center">
+  <!-- ── PANEL 4 : DÉCISION ── -->
+  <div class="sc-panel" id="panel-4">
+    <div class="panel-head">
+      <span class="panel-step-badge">04</span>
+      <div>
+        <div class="panel-title">⚖️ Décision</div>
+        <div class="panel-desc">Le moteur de règles évalue et sélectionne la politique d'adaptation.</div>
+      </div>
+    </div>
+    <div class="panel-body">
 
-      <div class="pipeline-wrap">
-
-        <!-- STEP 1 : Web Service -->
-        <div class="pipe-step" id="pipe-ws">
-          <div class="pipe-node" id="node-ws">
-            <span class="pipe-icon">⚙️</span>
-            <span class="pipe-label">Web Service</span>
-            <span class="pipe-method">POST /api/v1/ecg</span>
-          </div>
-          <div class="pipe-detail" id="detail-ws">
-            <div class="pd-title">Traitement reçu</div>
-            <div class="pd-row"><span>Statut HTTP</span><span id="ws-status" class="pd-val">—</span></div>
-            <div class="pd-row"><span>Validation</span><span id="ws-valid" class="pd-val">—</span></div>
-            <div class="pd-row"><span>Moteur adapt.</span><span id="ws-adapt" class="pd-val">—</span></div>
-            <div class="pd-row"><span>Durée traitement</span><span id="ws-time" class="pd-val">—</span></div>
-          </div>
-        </div>
-
-        <div class="pipe-arrow" id="arrow-ws-db">
-          <div class="arrow-line"><div class="arrow-packet" id="pkt-ws-db"></div></div>
-          <svg class="arrow-head" viewBox="0 0 10 10"><polygon points="0,0 10,5 0,10" fill="#38bdf8"/></svg>
-        </div>
-
-        <!-- STEP 2 : Base de données -->
-        <div class="pipe-step" id="pipe-db">
-          <div class="pipe-node" id="node-db">
-            <span class="pipe-icon">🗄️</span>
-            <span class="pipe-label">Base de Données</span>
-            <span class="pipe-method">TimescaleDB · INSERT</span>
-          </div>
-          <div class="pipe-detail" id="detail-db">
-            <div class="pd-title">Enregistrement</div>
-            <div class="pd-row"><span>Table</span><span class="pd-val mono">vitals_stream</span></div>
-            <div class="pd-row"><span>Entrées totales</span><span id="db-count" class="pd-val">—</span></div>
-            <div class="pd-row"><span>Partition active</span><span class="pd-val mono">2026-05</span></div>
-            <div class="pd-row"><span>Réplication</span><span class="pd-val" id="db-repl">—</span></div>
-          </div>
-        </div>
-
-        <div class="pipe-arrow" id="arrow-db-api">
-          <div class="arrow-line"><div class="arrow-packet" id="pkt-db-api"></div></div>
-          <svg class="arrow-head" viewBox="0 0 10 10"><polygon points="0,0 10,5 0,10" fill="#38bdf8"/></svg>
-        </div>
-
-        <!-- STEP 3 : API -->
-        <div class="pipe-step" id="pipe-api">
-          <div class="pipe-node" id="node-api">
-            <span class="pipe-icon">🔌</span>
-            <span class="pipe-label">REST API</span>
-            <span class="pipe-method">GET /api/v1/patients/P-0042</span>
-          </div>
-          <div class="pipe-detail" id="detail-api">
-            <div class="pd-title">Réponse API</div>
-            <div class="pd-row"><span>Code</span><span id="api-code" class="pd-val">—</span></div>
-            <div class="pd-row"><span>Latence</span><span id="api-latency" class="pd-val">—</span></div>
-            <div class="pd-row"><span>Alerte déclenchée</span><span id="api-alert" class="pd-val">—</span></div>
-            <div class="pd-row"><span>Mode adaptation</span><span id="api-mode" class="pd-val">—</span></div>
-          </div>
-        </div>
-
-        <div class="pipe-arrow" id="arrow-api-dash">
-          <div class="arrow-line"><div class="arrow-packet" id="pkt-api-dash"></div></div>
-          <svg class="arrow-head" viewBox="0 0 10 10"><polygon points="0,0 10,5 0,10" fill="#38bdf8"/></svg>
-        </div>
-
-        <!-- STEP 4 : Dashboard -->
-        <div class="pipe-step" id="pipe-dash">
-          <div class="pipe-node" id="node-dash">
-            <span class="pipe-icon">🖥️</span>
-            <span class="pipe-label">Dashboard Médecin</span>
-            <span class="pipe-method">Mise à jour temps réel</span>
-          </div>
-          <div class="pipe-detail" id="detail-dash">
-            <div class="pd-title">Affichage</div>
-            <div class="pd-row"><span>Médecin notifié</span><span id="dash-doc" class="pd-val">—</span></div>
-            <div class="pd-row"><span>Alerte visuelle</span><span id="dash-alert" class="pd-val">—</span></div>
-            <div class="pd-row"><span>Canal d'alerte</span><span id="dash-channel" class="pd-val">—</span></div>
-            <div class="pd-row"><span>Latence totale</span><span id="dash-total" class="pd-val">—</span></div>
-          </div>
-        </div>
-
+      <div class="rule-engine-header">
+        <div class="reh-title">Moteur de règles — Évaluation en cours</div>
+        <div class="reh-count">Règles évaluées : <strong id="rulesEval">0</strong> / <strong id="rulesTotal">8</strong></div>
       </div>
 
-      <!-- CYCLE COUNTER -->
-      <div class="cycle-info">
-        <div class="ci-item"><span class="ci-label">Cycle</span><span class="ci-val" id="cycleCount">0</span></div>
-        <div class="ci-item"><span class="ci-label">Latence moy.</span><span class="ci-val" id="avgLatency">—</span></div>
-        <div class="ci-item"><span class="ci-label">Alertes</span><span class="ci-val" id="alertCount">0</span></div>
-        <div class="ci-item"><span class="ci-label">Mode actuel</span><span class="ci-val" id="currentMode">—</span></div>
+      <div class="rules-list" id="rulesList">
+        <!-- filled by JS -->
+      </div>
+
+      <div class="decision-fired" id="decisionFired">
+        <div class="df-label">✅ Règle sélectionnée</div>
+        <div class="df-rule" id="dfRule">En attente...</div>
+        <div class="df-rationale" id="dfRationale"></div>
       </div>
 
     </div>
+  </div>
 
-    <!-- ═══ COLONNE DROITE : API JSON + Terminal + Dashboard ═══ -->
-    <div class="scen-col scen-col-right">
-
-      <!-- API RESPONSE -->
-      <div class="scen-card" id="card-api">
-        <div class="card-header">
-          <span class="card-icon">📄</span>
-          <div>
-            <div class="card-title">Réponse API (JSON)</div>
-            <div class="card-sub">GET /api/v1/patients/P-0042/vitals</div>
-          </div>
-          <div class="card-status" id="status-api">200 OK</div>
-        </div>
-        <pre class="api-json" id="apiJsonDisplay">{
-  "status": "waiting",
-  "message": "Démarrez la simulation..."
-}</pre>
+  <!-- ── PANEL 5 : ADAPTATION ── -->
+  <div class="sc-panel" id="panel-5">
+    <div class="panel-head">
+      <span class="panel-step-badge">05</span>
+      <div>
+        <div class="panel-title">⚡ Adaptation</div>
+        <div class="panel-desc">Reconfiguration dynamique des modules — avant / après.</div>
       </div>
+    </div>
+    <div class="panel-body">
 
-      <!-- DASHBOARD MÉDECIN -->
-      <div class="scen-card" id="card-dashboard">
-        <div class="card-header">
-          <span class="card-icon">🖥️</span>
-          <div>
-            <div class="card-title">Dashboard Médecin</div>
-            <div class="card-sub">Dr. Sophie Martin</div>
-          </div>
-          <div class="card-status" id="status-dash">Connecté</div>
+      <div class="adapt-compare">
+        <div class="ac-col ac-before">
+          <div class="ac-head">Configuration précédente</div>
+          <div id="configBefore" class="ac-items">—</div>
         </div>
-
-        <div class="mini-dashboard">
-          <div class="md-vitals">
-            <div class="md-vital" id="mdHR">
-              <div class="md-icon">❤️</div>
-              <div class="md-val" id="dashHR">--</div>
-              <div class="md-unit">bpm</div>
-              <div class="md-lbl">FC</div>
-            </div>
-            <div class="md-vital" id="mdSPO2">
-              <div class="md-icon">🫁</div>
-              <div class="md-val" id="dashSPO2">--</div>
-              <div class="md-unit">%</div>
-              <div class="md-lbl">SpO₂</div>
-            </div>
-            <div class="md-vital" id="mdTemp">
-              <div class="md-icon">🌡️</div>
-              <div class="md-val" id="dashTemp">--</div>
-              <div class="md-unit">°C</div>
-              <div class="md-lbl">Temp</div>
-            </div>
-            <div class="md-vital" id="mdBP">
-              <div class="md-icon">💉</div>
-              <div class="md-val" id="dashBP" style="font-size:.95rem">--/--</div>
-              <div class="md-unit">mmHg</div>
-              <div class="md-lbl">PA</div>
-            </div>
-          </div>
-
-          <div class="md-alert-zone" id="mdAlertZone">
-            <div class="mda-icon" id="mdaIcon">📊</div>
-            <div class="mda-text" id="mdaText">En attente de données...</div>
-          </div>
-
-          <div class="md-mode-bar" id="mdModeBar">
-            <span class="mdb-label">Mode actif :</span>
-            <span class="mdb-val" id="mdbMode">—</span>
-            <span class="mdb-freq" id="mdbFreq"></span>
-          </div>
+        <div class="ac-arrow">⟹</div>
+        <div class="ac-col ac-after">
+          <div class="ac-head">Nouvelle configuration</div>
+          <div id="configAfter" class="ac-items">—</div>
         </div>
       </div>
 
-      <!-- TERMINAL LOGS -->
-      <div class="scen-card card-terminal">
-        <div class="card-header">
-          <span class="card-icon">⌨️</span>
-          <div>
-            <div class="card-title">Journal système</div>
-            <div class="card-sub">Logs en temps réel</div>
-          </div>
-          <button class="btn-clear-log" onclick="clearLog()">Vider</button>
+      <div class="adapt-modules" id="adaptModules">
+        <div class="am-title">État des modules après adaptation</div>
+        <div class="am-grid" id="amGrid">
+          <!-- filled by JS -->
         </div>
-        <div class="terminal" id="terminal">
-          <div class="term-line term-info">[SYSTEM] Plateforme Ai Medical InFo initialisée.</div>
-          <div class="term-line term-info">[SYSTEM] En attente du démarrage de la simulation...</div>
+      </div>
+
+      <div class="adapt-notification" id="adaptNotif">
+        <div class="an-icon" id="anIcon">📋</div>
+        <div class="an-content">
+          <div class="an-title" id="anTitle">En attente...</div>
+          <div class="an-detail" id="anDetail"></div>
         </div>
+        <div class="an-channel" id="anChannel"></div>
+      </div>
+
+      <div class="adapt-loop-btn">
+        <div class="loop-arrow">↺</div>
+        <div class="loop-label">Retour à l'étape <strong>Objectif</strong> au prochain cycle</div>
+        <div class="loop-count">Cycle <span id="loopCycleNum">0</span></div>
       </div>
 
     </div>
+  </div>
 
-  </div><!-- end scenario-main -->
+</div><!-- end sc-main -->
 
-  <script src="scenario.js"></script>
+<!-- ═══════════════ BOTTOM BAR : log + counters ═══════════════ -->
+<div class="sc-bottom">
+  <div class="sc-counters">
+    <div class="sc-counter"><div class="scc-val" id="cntCycles">0</div><div class="scc-label">Cycles</div></div>
+    <div class="sc-counter"><div class="scc-val" id="cntLatency">—</div><div class="scc-label">Latence moy.</div></div>
+    <div class="sc-counter"><div class="scc-val" id="cntAlerts">0</div><div class="scc-label">Alertes</div></div>
+    <div class="sc-counter"><div class="scc-val" id="cntAdapt">0</div><div class="scc-label">Adaptations</div></div>
+    <div class="sc-counter"><div class="scc-val" id="cntStep">—</div><div class="scc-label">Étape active</div></div>
+  </div>
+  <div class="sc-terminal" id="scTerminal">
+    <div class="term-line term-sys">[SYSTÈME] Plateforme Ai Medical InFo — Moteur adaptatif v2.4 initialisé.</div>
+    <div class="term-line term-sys">[SYSTÈME] Sélectionnez un contexte et cliquez sur ▶ Lancer.</div>
+  </div>
+  <button class="btn-clear-term" onclick="clearTerm()">🗑 Vider</button>
+</div>
+
+<script src="scenario.js"></script>
 </body>
 </html>
