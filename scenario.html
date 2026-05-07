@@ -3,393 +3,284 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Scénario Adaptatif — Ai Medical InFo</title>
+  <title>Preuve Adaptative — Ai Medical InFo</title>
   <link rel="stylesheet" href="scenario.css"/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
 </head>
 <body>
 
-<!-- ═══════════════ HEADER ═══════════════ -->
+<!-- ══════════ HEADER ══════════ -->
 <header class="sc-header">
   <div class="sc-header-inner">
     <div class="sc-logo">
-      <svg viewBox="0 0 40 40" fill="none" width="34" height="34">
+      <svg viewBox="0 0 40 40" fill="none" width="32" height="32">
         <circle cx="20" cy="20" r="18" stroke="#38bdf8" stroke-width="2"/>
         <path d="M6 20h5l3-7 4 14 4-10 3 3h9" stroke="#38bdf8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
       <div>
-        <div class="sc-logo-name">Ai Medical InFo</div>
-        <div class="sc-logo-sub">Système adaptatif e-Santé — Démonstration du cycle de décision</div>
+        <span class="sc-logo-name">Ai Medical InFo</span>
+        <span class="sc-logo-sub">Preuve : Métriques → Situations → Décisions → Adaptations mesurables</span>
       </div>
     </div>
     <div class="sc-header-right">
       <div class="sc-clock" id="scClock">--:--:--</div>
-      <div class="sim-badge" id="simBadge"><span class="sim-dot idle"></span><span id="simLabel">Prêt</span></div>
-      <button class="btn-run"  id="btnRun"  onclick="startSim()">▶ Lancer</button>
-      <button class="btn-stop" id="btnStop" onclick="stopSim()" disabled>⏹ Arrêter</button>
-      <button class="btn-step" id="btnStep" onclick="stepOnce()">⏭ Étape par étape</button>
-      <a href="index.html" class="btn-back">← Retour</a>
+      <div class="sim-badge"><span class="sim-dot" id="simDot"></span><span id="simLabel">Prêt</span></div>
+      <button class="hbtn hbtn-run"  id="btnRun"  onclick="startScenario()">▶ Lancer</button>
+      <button class="hbtn hbtn-stop" id="btnStop" onclick="stopScenario()" disabled>⏹ Stop</button>
+      <a href="index.html" class="hbtn hbtn-back">← Retour</a>
     </div>
   </div>
 </header>
 
-<!-- ═══════════════ CONTEXT SELECTORS ═══════════════ -->
-<div class="context-bar">
-  <div class="ctx-group">
-    <span class="ctx-label">Patient</span>
-    <button class="ctx-btn ctx-stable   active" data-ctx="severity" data-val="stable"   onclick="setCtx(this,'severity','stable')">🟢 Stable</button>
-    <button class="ctx-btn ctx-moderate"        data-ctx="severity" data-val="moderate" onclick="setCtx(this,'severity','moderate')">🟡 Modéré</button>
-    <button class="ctx-btn ctx-critical"        data-ctx="severity" data-val="critical" onclick="setCtx(this,'severity','critical')">🔴 Critique</button>
+<!-- ══════════ 3 PROOF POINTS ══════════ -->
+<div class="proof-bar">
+  <div class="proof-item" id="proof1">
+    <div class="proof-num">①</div>
+    <div class="proof-body">
+      <div class="proof-title">Métriques → Situations</div>
+      <div class="proof-desc">Les valeurs brutes sont <em>interprétées</em>, pas seulement affichées</div>
+    </div>
+    <div class="proof-indicator" id="pi1"><span>—</span></div>
   </div>
-  <div class="ctx-sep"></div>
-  <div class="ctx-group">
-    <span class="ctx-label">Réseau</span>
-    <button class="ctx-btn ctx-high   active" data-ctx="network" data-val="high"   onclick="setCtx(this,'network','high')">📶 WiFi/5G</button>
-    <button class="ctx-btn ctx-medium"        data-ctx="network" data-val="medium" onclick="setCtx(this,'network','medium')">📶 4G</button>
-    <button class="ctx-btn ctx-low"           data-ctx="network" data-val="low"    onclick="setCtx(this,'network','low')">📡 Dégradé</button>
+  <div class="proof-sep"></div>
+  <div class="proof-item" id="proof2">
+    <div class="proof-num">②</div>
+    <div class="proof-body">
+      <div class="proof-title">Situations → QoS/SLA</div>
+      <div class="proof-desc">Chaque situation est liée à un objectif de service <em>quantifié</em></div>
+    </div>
+    <div class="proof-indicator" id="pi2"><span>—</span></div>
   </div>
-  <div class="ctx-sep"></div>
-  <div class="ctx-group">
-    <span class="ctx-label">Dispositif</span>
-    <button class="ctx-btn ctx-high   active" data-ctx="device" data-val="station" onclick="setCtx(this,'device','station')">🖥️ Station</button>
-    <button class="ctx-btn ctx-medium"        data-ctx="device" data-val="tablet"  onclick="setCtx(this,'device','tablet')">📱 Tablette</button>
-    <button class="ctx-btn ctx-low"           data-ctx="device" data-val="iot"     onclick="setCtx(this,'device','iot')">📡 IoT</button>
+  <div class="proof-sep"></div>
+  <div class="proof-item" id="proof3">
+    <div class="proof-num">③</div>
+    <div class="proof-body">
+      <div class="proof-title">Décisions mesurables avant/après</div>
+      <div class="proof-desc">Chaque adaptation produit un delta <em>quantifiable</em> et vérifiable</div>
+    </div>
+    <div class="proof-indicator" id="pi3"><span>—</span></div>
   </div>
-  <div class="ctx-sep"></div>
-  <div class="ctx-summary" id="ctxSummary">Situation : <strong>Normale</strong></div>
 </div>
 
-<!-- ═══════════════ 5-STEP PIPELINE ═══════════════ -->
-<div class="pipeline-bar">
-
-  <!-- STEP 1 -->
-  <div class="pipe-step" id="pstep-1">
-    <div class="pipe-num">01</div>
-    <div class="pipe-icon-wrap"><span class="pipe-icon">🎯</span></div>
-    <div class="pipe-title">Objectif</div>
-    <div class="pipe-sub">Définir les buts</div>
-    <div class="pipe-progress" id="pp-1"><div class="pipe-fill" id="pf-1"></div></div>
+<!-- ══════════ 5 SCENARIOS SELECTOR ══════════ -->
+<div class="scenarios-bar">
+  <div class="sb-label">5 Scénarios de démonstration :</div>
+  <div class="sb-cards">
+    <button class="scen-card" id="sc0" onclick="pickScenario(0)">
+      <span class="scen-num">S1</span>
+      <span class="scen-dot s-green"></span>
+      <div class="scen-info">
+        <div class="scen-name">Dégradation Silencieuse</div>
+        <div class="scen-hint">Stable → SpO₂ chute progressivement</div>
+      </div>
+    </button>
+    <button class="scen-card" id="sc1" onclick="pickScenario(1)">
+      <span class="scen-num">S2</span>
+      <span class="scen-dot s-red"></span>
+      <div class="scen-info">
+        <div class="scen-name">Tempête Réseau</div>
+        <div class="scen-hint">Critique + réseau défaillant</div>
+      </div>
+    </button>
+    <button class="scen-card" id="sc2" onclick="pickScenario(2)">
+      <span class="scen-num">S3</span>
+      <span class="scen-dot s-orange"></span>
+      <div class="scen-info">
+        <div class="scen-name">Contrainte IoT</div>
+        <div class="scen-hint">Modéré + seul capteur IoT dispo</div>
+      </div>
+    </button>
+    <button class="scen-card" id="sc3" onclick="pickScenario(3)">
+      <span class="scen-num">S4</span>
+      <span class="scen-dot s-blue"></span>
+      <div class="scen-info">
+        <div class="scen-name">Rebond Clinique</div>
+        <div class="scen-hint">Critique → retour au stable</div>
+      </div>
+    </button>
+    <button class="scen-card" id="sc4" onclick="pickScenario(4)">
+      <span class="scen-num">S5</span>
+      <span class="scen-dot s-purple"></span>
+      <div class="scen-info">
+        <div class="scen-name">Saturation Totale</div>
+        <div class="scen-hint">Critique + réseau bas + IoT</div>
+      </div>
+    </button>
   </div>
+</div>
 
-  <div class="pipe-connector" id="conn-1">
-    <div class="conn-line"><div class="conn-packet" id="cpkt-1"></div></div>
-    <svg width="10" height="14" viewBox="0 0 10 14"><polygon points="0,0 10,7 0,14" fill="#334155"/></svg>
+<!-- ══════════ PROMETHEUS BAR ══════════ -->
+<div class="prom-bar">
+  <div class="prom-status" id="promStatus">
+    <span class="prom-dot" id="promDot"></span>
+    <span id="promLabel">Prometheus : simulation locale</span>
   </div>
-
-  <!-- STEP 2 -->
-  <div class="pipe-step" id="pstep-2">
-    <div class="pipe-num">02</div>
-    <div class="pipe-icon-wrap"><span class="pipe-icon">📊</span></div>
-    <div class="pipe-title">Métrique</div>
-    <div class="pipe-sub">Mesurer le contexte</div>
-    <div class="pipe-progress" id="pp-2"><div class="pipe-fill" id="pf-2"></div></div>
+  <div class="prom-endpoint">
+    <span class="prom-ep-label">Endpoint :</span>
+    <input class="prom-ep-input" id="promEndpoint" value="http://localhost:9090" placeholder="http://localhost:9090"/>
+    <button class="prom-ep-btn" onclick="connectPrometheus()">Connecter</button>
   </div>
-
-  <div class="pipe-connector" id="conn-2">
-    <div class="conn-line"><div class="conn-packet" id="cpkt-2"></div></div>
-    <svg width="10" height="14" viewBox="0 0 10 14"><polygon points="0,0 10,7 0,14" fill="#334155"/></svg>
+  <div class="prom-query-display" id="promQueryDisplay">
+    <span class="pq-label">PromQL actif :</span>
+    <code class="pq-code" id="promQuery">—</code>
   </div>
-
-  <!-- STEP 3 -->
-  <div class="pipe-step" id="pstep-3">
-    <div class="pipe-num">03</div>
-    <div class="pipe-icon-wrap"><span class="pipe-icon">🔍</span></div>
-    <div class="pipe-title">Situation</div>
-    <div class="pipe-sub">Évaluer l'état global</div>
-    <div class="pipe-progress" id="pp-3"><div class="pipe-fill" id="pf-3"></div></div>
+  <div class="prom-grafana-link">
+    <span class="pg-label">Grafana :</span>
+    <a class="pg-link" id="grafanaLink" href="#" target="_blank">dashboard → panel</a>
   </div>
+</div>
 
-  <div class="pipe-connector" id="conn-3">
-    <div class="conn-line"><div class="conn-packet" id="cpkt-3"></div></div>
-    <svg width="10" height="14" viewBox="0 0 10 14"><polygon points="0,0 10,7 0,14" fill="#334155"/></svg>
-  </div>
-
-  <!-- STEP 4 -->
-  <div class="pipe-step" id="pstep-4">
-    <div class="pipe-num">04</div>
-    <div class="pipe-icon-wrap"><span class="pipe-icon">⚖️</span></div>
-    <div class="pipe-title">Décision</div>
-    <div class="pipe-sub">Sélectionner la règle</div>
-    <div class="pipe-progress" id="pp-4"><div class="pipe-fill" id="pf-4"></div></div>
-  </div>
-
-  <div class="pipe-connector" id="conn-4">
-    <div class="conn-line"><div class="conn-packet" id="cpkt-4"></div></div>
-    <svg width="10" height="14" viewBox="0 0 10 14"><polygon points="0,0 10,7 0,14" fill="#334155"/></svg>
-  </div>
-
-  <!-- STEP 5 -->
-  <div class="pipe-step" id="pstep-5">
-    <div class="pipe-num">05</div>
-    <div class="pipe-icon-wrap"><span class="pipe-icon">⚡</span></div>
-    <div class="pipe-title">Adaptation</div>
-    <div class="pipe-sub">Appliquer la config</div>
-    <div class="pipe-progress" id="pp-5"><div class="pipe-fill" id="pf-5"></div></div>
-  </div>
-
-</div><!-- end pipeline-bar -->
-
-<!-- ═══════════════ MAIN CONTENT (5 panels) ═══════════════ -->
+<!-- ══════════ MAIN : 5 COLUMNS ══════════ -->
 <div class="sc-main">
 
-  <!-- ── PANEL 1 : OBJECTIF ── -->
-  <div class="sc-panel" id="panel-1">
-    <div class="panel-head">
-      <span class="panel-step-badge">01</span>
-      <div>
-        <div class="panel-title">🎯 Objectif</div>
-        <div class="panel-desc">Définir ce que le système doit garantir en toutes circonstances.</div>
-      </div>
+  <!-- ── COL 1 : OBJECTIF / QoS ── -->
+  <div class="sc-col" id="col1">
+    <div class="col-header ch1">
+      <span class="col-step">01</span>
+      <span class="col-title">🎯 Objectif &amp; QoS/SLA</span>
     </div>
-    <div class="panel-body">
-      <div class="obj-main" id="objMain">
-        <div class="obj-quote" id="objQuote">
-          "Assurer une surveillance médicale continue, adaptée à l'état du patient, à la qualité du réseau et aux capacités du dispositif."
-        </div>
-      </div>
-      <div class="obj-grid">
-        <div class="obj-card" id="obj-clinical">
-          <div class="obj-icon">❤️</div>
-          <div class="obj-label">Objectif clinique</div>
-          <div class="obj-val" id="obj-clinical-val">Détection précoce des anomalies vitales</div>
-          <div class="obj-kpi" id="obj-clinical-kpi">Seuil : SpO₂ &lt; 90% → Critique</div>
-        </div>
-        <div class="obj-card" id="obj-network">
-          <div class="obj-icon">📡</div>
-          <div class="obj-label">Objectif réseau</div>
-          <div class="obj-val" id="obj-network-val">Maintenir la transmission des données vitales</div>
-          <div class="obj-kpi" id="obj-network-kpi">Bande passante min : 64 Kbps</div>
-        </div>
-        <div class="obj-card" id="obj-device">
-          <div class="obj-icon">🔋</div>
-          <div class="obj-label">Objectif dispositif</div>
-          <div class="obj-val" id="obj-device-val">Adapter la charge de traitement au matériel</div>
-          <div class="obj-kpi" id="obj-device-kpi">IoT : max 2 modules simultanés</div>
-        </div>
-      </div>
-      <div class="obj-priority" id="objPriority">
-        <span class="opp-label">Priorité actuelle :</span>
-        <span class="opp-val" id="oppVal">En attente de simulation...</span>
-      </div>
-    </div>
-  </div>
+    <div class="col-body">
 
-  <!-- ── PANEL 2 : MÉTRIQUE ── -->
-  <div class="sc-panel" id="panel-2">
-    <div class="panel-head">
-      <span class="panel-step-badge">02</span>
-      <div>
-        <div class="panel-title">📊 Métrique</div>
-        <div class="panel-desc">Collecter et mesurer toutes les variables cliniques et contextuelles.</div>
+      <div class="qos-scenario-desc" id="qosScenDesc">
+        Sélectionnez un scénario pour voir les objectifs QoS associés.
       </div>
-    </div>
-    <div class="panel-body">
-      <div class="metric-sections">
 
-        <div class="metric-section">
-          <div class="ms-title">🩺 Métriques cliniques</div>
-          <div class="metric-grid">
-            <div class="metric-box" id="met-hr">
-              <div class="mb-label">Fréquence cardiaque</div>
-              <div class="mb-val" id="mv-hr">--</div>
-              <div class="mb-unit">bpm</div>
-              <div class="mb-bar"><div class="mb-fill" id="mf-hr"></div></div>
-              <div class="mb-ref">Normale : 60–100</div>
-            </div>
-            <div class="metric-box" id="met-spo2">
-              <div class="mb-label">Saturation SpO₂</div>
-              <div class="mb-val" id="mv-spo2">--</div>
-              <div class="mb-unit">%</div>
-              <div class="mb-bar"><div class="mb-fill" id="mf-spo2"></div></div>
-              <div class="mb-ref">Normale : ≥ 95%</div>
-            </div>
-            <div class="metric-box" id="met-temp">
-              <div class="mb-label">Température</div>
-              <div class="mb-val" id="mv-temp">--</div>
-              <div class="mb-unit">°C</div>
-              <div class="mb-bar"><div class="mb-fill" id="mf-temp"></div></div>
-              <div class="mb-ref">Normale : 36.1–37.2</div>
-            </div>
-            <div class="metric-box" id="met-bp">
-              <div class="mb-label">Pression artérielle</div>
-              <div class="mb-val" id="mv-bp" style="font-size:1rem">--/--</div>
-              <div class="mb-unit">mmHg</div>
-              <div class="mb-bar"><div class="mb-fill" id="mf-bp"></div></div>
-              <div class="mb-ref">Normale : 120/80</div>
-            </div>
-            <div class="metric-box" id="met-resp">
-              <div class="mb-label">Fr. respiratoire</div>
-              <div class="mb-val" id="mv-resp">--</div>
-              <div class="mb-unit">resp/min</div>
-              <div class="mb-bar"><div class="mb-fill" id="mf-resp"></div></div>
-              <div class="mb-ref">Normale : 12–20</div>
-            </div>
-            <div class="metric-box" id="met-score">
-              <div class="mb-label">Score clinique</div>
-              <div class="mb-val" id="mv-score">--</div>
-              <div class="mb-unit">/ 10</div>
-              <div class="mb-bar"><div class="mb-fill" id="mf-score"></div></div>
-              <div class="mb-ref">Seuil critique : ≥ 7</div>
-            </div>
-          </div>
+      <div class="sla-grid" id="slaGrid">
+        <div class="sla-card" id="sla-latency">
+          <div class="sla-name">Latence alerte</div>
+          <div class="sla-target" id="sla-latency-target">—</div>
+          <div class="sla-measured" id="sla-latency-meas">Non mesuré</div>
+          <div class="sla-badge" id="sla-latency-badge">—</div>
         </div>
-
-        <div class="metric-section">
-          <div class="ms-title">🌐 Métriques contextuelles</div>
-          <div class="ctx-metric-grid">
-            <div class="ctx-met-card" id="ctxm-net">
-              <div class="cmm-icon">📶</div>
-              <div class="cmm-label">Réseau</div>
-              <div class="cmm-val" id="cmv-net">--</div>
-              <div class="cmm-sub" id="cms-net">--</div>
-            </div>
-            <div class="ctx-met-card" id="ctxm-dev">
-              <div class="cmm-icon">💻</div>
-              <div class="cmm-label">Dispositif</div>
-              <div class="cmm-val" id="cmv-dev">--</div>
-              <div class="cmm-sub" id="cms-dev">--</div>
-            </div>
-            <div class="ctx-met-card" id="ctxm-bw">
-              <div class="cmm-icon">⬆️</div>
-              <div class="cmm-label">Bande passante</div>
-              <div class="cmm-val" id="cmv-bw">--</div>
-              <div class="cmm-sub" id="cms-bw">Kbps</div>
-            </div>
-            <div class="ctx-met-card" id="ctxm-cpu">
-              <div class="cmm-icon">⚙️</div>
-              <div class="cmm-label">CPU disponible</div>
-              <div class="cmm-val" id="cmv-cpu">--</div>
-              <div class="cmm-sub">%</div>
-            </div>
-          </div>
+        <div class="sla-card" id="sla-freq">
+          <div class="sla-name">Fréq. ECG min.</div>
+          <div class="sla-target" id="sla-freq-target">—</div>
+          <div class="sla-measured" id="sla-freq-meas">Non mesuré</div>
+          <div class="sla-badge" id="sla-freq-badge">—</div>
         </div>
-
+        <div class="sla-card" id="sla-uptime">
+          <div class="sla-name">Uptime capteurs</div>
+          <div class="sla-target" id="sla-uptime-target">—</div>
+          <div class="sla-measured" id="sla-uptime-meas">Non mesuré</div>
+          <div class="sla-badge" id="sla-uptime-badge">—</div>
+        </div>
+        <div class="sla-card" id="sla-bw">
+          <div class="sla-name">Bande passante min.</div>
+          <div class="sla-target" id="sla-bw-target">—</div>
+          <div class="sla-measured" id="sla-bw-meas">Non mesuré</div>
+          <div class="sla-badge" id="sla-bw-badge">—</div>
+        </div>
       </div>
+
+      <div class="sla-compliance" id="slaCompliance">
+        <div class="slac-title">Conformité SLA</div>
+        <div class="slac-score" id="slacScore">—</div>
+        <div class="slac-detail" id="slacDetail">En attente...</div>
+      </div>
+
     </div>
   </div>
 
-  <!-- ── PANEL 3 : SITUATION ── -->
-  <div class="sc-panel" id="panel-3">
-    <div class="panel-head">
-      <span class="panel-step-badge">03</span>
-      <div>
-        <div class="panel-title">🔍 Situation</div>
-        <div class="panel-desc">Croiser les métriques pour classifier la situation globale.</div>
-      </div>
+  <!-- ── COL 2 : MÉTRIQUE (interprétée) ── -->
+  <div class="sc-col" id="col2">
+    <div class="col-header ch2">
+      <span class="col-step">02</span>
+      <span class="col-title">📊 Métriques interprétées</span>
     </div>
-    <div class="panel-body">
+    <div class="col-body">
 
-      <div class="situation-global" id="sitGlobal">
-        <div class="sg-label">Situation globale détectée</div>
-        <div class="sg-name" id="sgName">—</div>
-        <div class="sg-desc" id="sgDesc">En attente des métriques...</div>
-      </div>
+      <div class="prom-source-badge" id="promSourceBadge">Source : simulation</div>
 
-      <div class="situation-matrix">
-        <div class="sm-title">Analyse multicritère</div>
-        <div class="sm-rows">
-          <div class="sm-row">
-            <span class="sm-dim">État clinique</span>
-            <div class="sm-bar-wrap"><div class="sm-bar" id="smb-clinical"><div class="sm-fill" id="smf-clinical"></div></div></div>
-            <span class="sm-result" id="smr-clinical">—</span>
-          </div>
-          <div class="sm-row">
-            <span class="sm-dim">Qualité réseau</span>
-            <div class="sm-bar-wrap"><div class="sm-bar" id="smb-network"><div class="sm-fill" id="smf-network"></div></div></div>
-            <span class="sm-result" id="smr-network">—</span>
-          </div>
-          <div class="sm-row">
-            <span class="sm-dim">Capacité dispositif</span>
-            <div class="sm-bar-wrap"><div class="sm-bar" id="smb-device"><div class="sm-fill" id="smf-device"></div></div></div>
-            <span class="sm-result" id="smr-device">—</span>
-          </div>
-          <div class="sm-row sm-row-total">
-            <span class="sm-dim">Score combiné</span>
-            <div class="sm-bar-wrap"><div class="sm-bar" id="smb-total"><div class="sm-fill" id="smf-total"></div></div></div>
-            <span class="sm-result" id="smr-total">—</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="situation-flags" id="sitFlags">
+      <div class="metric-rows" id="metricRows">
         <!-- filled by JS -->
       </div>
 
+      <div class="interpretation-box" id="interpretationBox">
+        <div class="ib-title">Interprétation système</div>
+        <div class="ib-lines" id="ibLines">En attente de mesures...</div>
+      </div>
+
     </div>
   </div>
 
-  <!-- ── PANEL 4 : DÉCISION ── -->
-  <div class="sc-panel" id="panel-4">
-    <div class="panel-head">
-      <span class="panel-step-badge">04</span>
-      <div>
-        <div class="panel-title">⚖️ Décision</div>
-        <div class="panel-desc">Le moteur de règles évalue et sélectionne la politique d'adaptation.</div>
-      </div>
+  <!-- ── COL 3 : SITUATION ── -->
+  <div class="sc-col" id="col3">
+    <div class="col-header ch3">
+      <span class="col-step">03</span>
+      <span class="col-title">🔍 Situation classifiée</span>
     </div>
-    <div class="panel-body">
+    <div class="col-body">
 
-      <div class="rule-engine-header">
-        <div class="reh-title">Moteur de règles — Évaluation en cours</div>
-        <div class="reh-count">Règles évaluées : <strong id="rulesEval">0</strong> / <strong id="rulesTotal">8</strong></div>
+      <div class="sit-name-box" id="sitNameBox">
+        <div class="snb-label">Situation détectée</div>
+        <div class="snb-name" id="snbName">—</div>
+        <div class="snb-code" id="snbCode">—</div>
       </div>
 
-      <div class="rules-list" id="rulesList">
+      <div class="sit-factors" id="sitFactors">
         <!-- filled by JS -->
       </div>
 
-      <div class="decision-fired" id="decisionFired">
-        <div class="df-label">✅ Règle sélectionnée</div>
-        <div class="df-rule" id="dfRule">En attente...</div>
-        <div class="df-rationale" id="dfRationale"></div>
+      <div class="sit-proof-link" id="sitProofLink">
+        <div class="spl-title">① Preuve : Métrique → Situation</div>
+        <div class="spl-body" id="splBody">—</div>
       </div>
 
     </div>
   </div>
 
-  <!-- ── PANEL 5 : ADAPTATION ── -->
-  <div class="sc-panel" id="panel-5">
-    <div class="panel-head">
-      <span class="panel-step-badge">05</span>
-      <div>
-        <div class="panel-title">⚡ Adaptation</div>
-        <div class="panel-desc">Reconfiguration dynamique des modules — avant / après.</div>
-      </div>
+  <!-- ── COL 4 : DÉCISION ── -->
+  <div class="sc-col" id="col4">
+    <div class="col-header ch4">
+      <span class="col-step">04</span>
+      <span class="col-title">⚖️ Décision &amp; Règle</span>
     </div>
-    <div class="panel-body">
+    <div class="col-body">
 
-      <div class="adapt-compare">
-        <div class="ac-col ac-before">
-          <div class="ac-head">Configuration précédente</div>
-          <div id="configBefore" class="ac-items">—</div>
-        </div>
-        <div class="ac-arrow">⟹</div>
-        <div class="ac-col ac-after">
-          <div class="ac-head">Nouvelle configuration</div>
-          <div id="configAfter" class="ac-items">—</div>
-        </div>
+      <div class="rule-fired-box" id="ruleFiredBox">
+        <div class="rfb-id" id="rfbId">—</div>
+        <div class="rfb-cond" id="rfbCond">En attente...</div>
+        <div class="rfb-action" id="rfbAction">—</div>
       </div>
 
-      <div class="adapt-modules" id="adaptModules">
-        <div class="am-title">État des modules après adaptation</div>
-        <div class="am-grid" id="amGrid">
-          <!-- filled by JS -->
-        </div>
+      <div class="rule-chain" id="ruleChain">
+        <!-- rules evaluated -->
       </div>
 
-      <div class="adapt-notification" id="adaptNotif">
-        <div class="an-icon" id="anIcon">📋</div>
-        <div class="an-content">
-          <div class="an-title" id="anTitle">En attente...</div>
-          <div class="an-detail" id="anDetail"></div>
-        </div>
-        <div class="an-channel" id="anChannel"></div>
+      <div class="dec-proof-link">
+        <div class="spl-title">② Preuve : Situation → QoS/SLA</div>
+        <div class="spl-body" id="decProofBody">—</div>
       </div>
 
-      <div class="adapt-loop-btn">
-        <div class="loop-arrow">↺</div>
-        <div class="loop-label">Retour à l'étape <strong>Objectif</strong> au prochain cycle</div>
-        <div class="loop-count">Cycle <span id="loopCycleNum">0</span></div>
+    </div>
+  </div>
+
+  <!-- ── COL 5 : ADAPTATION avant/après ── -->
+  <div class="sc-col" id="col5">
+    <div class="col-header ch5">
+      <span class="col-step">05</span>
+      <span class="col-title">⚡ Adaptation mesurable</span>
+    </div>
+    <div class="col-body">
+
+      <div class="delta-table" id="deltaTable">
+        <div class="dt-head">
+          <span>Paramètre</span><span>Avant</span><span>Après</span><span>Δ</span>
+        </div>
+        <div id="dtRows">—</div>
+      </div>
+
+      <div class="adapt-proof-link">
+        <div class="spl-title">③ Preuve : Adaptation avant/après</div>
+        <div class="kpi-deltas" id="kpiDeltas">En attente...</div>
+      </div>
+
+      <div class="notif-box" id="notifBox">
+        <div class="nb-icon" id="nbIcon">📋</div>
+        <div class="nb-body">
+          <div class="nb-title" id="nbTitle">En attente...</div>
+          <div class="nb-chan"  id="nbChan">—</div>
+        </div>
       </div>
 
     </div>
@@ -397,22 +288,38 @@
 
 </div><!-- end sc-main -->
 
-<!-- ═══════════════ BOTTOM BAR : log + counters ═══════════════ -->
-<div class="sc-bottom">
-  <div class="sc-counters">
-    <div class="sc-counter"><div class="scc-val" id="cntCycles">0</div><div class="scc-label">Cycles</div></div>
-    <div class="sc-counter"><div class="scc-val" id="cntLatency">—</div><div class="scc-label">Latence moy.</div></div>
-    <div class="sc-counter"><div class="scc-val" id="cntAlerts">0</div><div class="scc-label">Alertes</div></div>
-    <div class="sc-counter"><div class="scc-val" id="cntAdapt">0</div><div class="scc-label">Adaptations</div></div>
-    <div class="sc-counter"><div class="scc-val" id="cntStep">—</div><div class="scc-label">Étape active</div></div>
-  </div>
-  <div class="sc-terminal" id="scTerminal">
-    <div class="term-line term-sys">[SYSTÈME] Plateforme Ai Medical InFo — Moteur adaptatif v2.4 initialisé.</div>
-    <div class="term-line term-sys">[SYSTÈME] Sélectionnez un contexte et cliquez sur ▶ Lancer.</div>
-  </div>
-  <button class="btn-clear-term" onclick="clearTerm()">🗑 Vider</button>
+<!-- ══════════ PIPELINE PROGRESS ══════════ -->
+<div class="pipe-progress-bar">
+  <div class="ppb-step" id="ppb1"><div class="ppb-fill" id="ppbf1"></div><span>Objectif</span></div>
+  <div class="ppb-arrow">→</div>
+  <div class="ppb-step" id="ppb2"><div class="ppb-fill" id="ppbf2"></div><span>Métrique</span></div>
+  <div class="ppb-arrow">→</div>
+  <div class="ppb-step" id="ppb3"><div class="ppb-fill" id="ppbf3"></div><span>Situation</span></div>
+  <div class="ppb-arrow">→</div>
+  <div class="ppb-step" id="ppb4"><div class="ppb-fill" id="ppbf4"></div><span>Décision</span></div>
+  <div class="ppb-arrow">→</div>
+  <div class="ppb-step" id="ppb5"><div class="ppb-fill" id="ppbf5"></div><span>Adaptation</span></div>
+  <div class="ppb-arrow ppb-loop">↺</div>
 </div>
 
+<!-- ══════════ BOTTOM : counters + terminal ══════════ -->
+<div class="sc-bottom">
+  <div class="sc-counters">
+    <div class="scc"><div class="scc-v" id="cntCycle">0</div><div class="scc-l">Cycles</div></div>
+    <div class="scc"><div class="scc-v" id="cntAlert">0</div><div class="scc-l">Alertes</div></div>
+    <div class="scc"><div class="scc-v" id="cntAdapt">0</div><div class="scc-l">Adaptations</div></div>
+    <div class="scc"><div class="scc-v" id="cntSLA">—</div><div class="scc-l">SLA OK</div></div>
+    <div class="scc"><div class="scc-v" id="cntDelta">—</div><div class="scc-l">Δ ECG Hz</div></div>
+    <div class="scc"><div class="scc-v" id="cntLatency">—</div><div class="scc-l">Latence moy.</div></div>
+  </div>
+  <div class="sc-terminal" id="scTerminal">
+    <div class="tl ts">[SYS] Ai Medical InFo — Moteur de preuve adaptative v3.0</div>
+    <div class="tl ts">[SYS] Sélectionnez un scénario et cliquez ▶ Lancer</div>
+  </div>
+  <button class="btn-clr" onclick="clrTerm()">🗑</button>
+</div>
+
+<script src="prometheus-client.js"></script>
 <script src="scenario.js"></script>
 </body>
 </html>

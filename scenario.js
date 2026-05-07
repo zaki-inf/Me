@@ -1,689 +1,562 @@
 'use strict';
-
 // ══════════════════════════════════════════════════════════════
-// CONTEXT STATE
+// Ai Medical InFo — Moteur de preuve adaptative v3.0
+// Prouve : Métriques→Situations→QoS/SLA→Décisions→Adaptations
 // ══════════════════════════════════════════════════════════════
-const ctx = { severity: 'stable', network: 'high', device: 'station' };
 
-let running    = false;
-let simTimer   = null;
-let cycleCount = 0;
-let alertCount = 0;
-let adaptCount = 0;
-let latencies  = [];
-let stepMode   = false;
-let stepResolve = null;
-let prevConfig = null;
-
-// ══════════════════════════════════════════════════════════════
-// DATA TABLES
-// ══════════════════════════════════════════════════════════════
-const VITALS = {
-  stable:   () => ({ hr: r(68,82),  spo2: r(97,99), temp: rf(36.4,37.0), sbp: r(112,125), dbp: r(72,80),  resp: r(14,18), score: rf(1,3)  }),
-  moderate: () => ({ hr: r(100,115),spo2: r(93,96), temp: rf(38.2,38.9), sbp: r(145,162), dbp: r(92,102), resp: r(20,26), score: rf(5,6.5)}),
-  critical: () => ({ hr: r(120,145),spo2: r(84,91), temp: rf(39.1,40.2), sbp: r(170,198), dbp: r(108,122),resp: r(28,36), score: rf(7.5,10)})
-};
-
-const NET_DATA = {
-  high:   { label: 'WiFi / 5G',    bw: ()=>r(85,150), cpu: ()=>r(80,95) },
-  medium: { label: '4G',           bw: ()=>r(25,60),  cpu: ()=>r(55,75) },
-  low:    { label: 'Edge / 2G',    bw: ()=>r(4,15),   cpu: ()=>r(20,40) }
-};
-
-const DEV_DATA = {
-  station: { label: 'Station clinique', cap: ()=>r(85,99),  modules: 6 },
-  tablet:  { label: 'Tablette médicale',cap: ()=>r(55,75),  modules: 4 },
-  iot:     { label: 'Capteur IoT',      cap: ()=>r(20,40),  modules: 2 }
-};
-
-// ══════════════════════════════════════════════════════════════
-// ADAPTATION RULES (evaluated in order)
-// ══════════════════════════════════════════════════════════════
-const RULES = [
+// ── 5 SCÉNARIOS ────────────────────────────────────────────────
+const SCENARIOS = [
   {
-    id: 'R1', priority: 1,
-    cond: (s,n,d) => s==='critical',
-    label: 'IF patient=CRITIQUE → Priorité absolue',
-    result: 'Mode CRITIQUE — tous capteurs max',
-    config: { ecgHz:'500 Hz', spo2:'1 s', temp:'5 s', bp:'30 s', resp:'1 s', compression:'Max', alert:'ALARME SALLE', adaptMode:'Critique' }
+    id: 0, key: 'stable', simKey: 'stable',
+    name: 'S1 — Dégradation Silencieuse',
+    desc: 'Patient stable dont le SpO₂ chute progressivement sous le seuil critique. Le système détecte l\'anomalie avant le médecin et reconfigure les modules.',
+    severity: 'stable', network: 'high', device: 'tablet',
+    qos: {
+      latency:  { target: '≤ 500ms', sla: 500  },
+      ecgHz:    { target: '≥ 250 Hz', sla: 250  },
+      uptime:   { target: '≥ 99%',    sla: 99   },
+      bw:       { target: '≥ 64 Kbps',sla: 64   },
+    },
+    color: '#4ade80',
   },
   {
-    id: 'R2', priority: 2,
-    cond: (s,n,d) => s==='critical' && n==='low',
-    label: 'IF patient=CRITIQUE AND réseau=Dégradé → Compression forcée',
-    result: 'ECG compressé 250 Hz + modules non-vitaux suspendus',
-    config: { ecgHz:'250 Hz*', spo2:'1 s', temp:'10 s', bp:'SUSPENDU', resp:'SUSPENDU', compression:'Maximale', alert:'ALARME SALLE + SMS', adaptMode:'Critique Dégradé' }
+    id: 1, key: 'network_storm', simKey: 'network_storm',
+    name: 'S2 — Tempête Réseau',
+    desc: 'Patient critique avec défaillance réseau simultanée. Le moteur active la compression maximale tout en maintenant ECG et SpO₂ pour ne pas perdre la surveillance vitale.',
+    severity: 'critical', network: 'low', device: 'station',
+    qos: {
+      latency:  { target: '≤ 200ms',  sla: 200  },
+      ecgHz:    { target: '≥ 250 Hz', sla: 250  },
+      uptime:   { target: '≥ 99.9%',  sla: 99.9 },
+      bw:       { target: '≥ 8 Kbps', sla: 8    },
+    },
+    color: '#f87171',
   },
   {
-    id: 'R3', priority: 3,
-    cond: (s,n,d) => s==='moderate' && d==='station',
-    label: 'IF patient=Modéré AND dispositif=Station → Surveillance accrue',
-    result: 'ECG 400 Hz, SpO₂ toutes 5 s, alertes SMS + Appel',
-    config: { ecgHz:'400 Hz', spo2:'5 s', temp:'10 s', bp:'2 min', resp:'5 s', compression:'Élevée', alert:'SMS + Appel', adaptMode:'Modéré' }
+    id: 2, key: 'iot_constrained', simKey: 'iot_constrained',
+    name: 'S3 — Contrainte IoT',
+    desc: 'Patient modéré surveillé par un capteur IoT à ressources limitées. Le système suspend les modules non vitaux et priorise ECG + SpO₂ dans les 2 slots disponibles.',
+    severity: 'moderate', network: 'medium', device: 'iot',
+    qos: {
+      latency:  { target: '≤ 350ms',  sla: 350  },
+      ecgHz:    { target: '≥ 125 Hz', sla: 125  },
+      uptime:   { target: '≥ 99%',    sla: 99   },
+      bw:       { target: '≥ 20 Kbps',sla: 20   },
+    },
+    color: '#fb923c',
   },
   {
-    id: 'R4', priority: 4,
-    cond: (s,n,d) => s==='moderate' && (d==='tablet'||d==='iot'),
-    label: 'IF patient=Modéré AND dispositif=Tablette/IoT → Surveillance réduite',
-    result: 'ECG 250 Hz, modules secondaires en veille',
-    config: { ecgHz:'250 Hz', spo2:'10 s', temp:'30 s', bp:'5 min', resp:'RÉDUIT', compression:'Élevée', alert:'SMS', adaptMode:'Modéré Réduit' }
+    id: 3, key: 'rebound', simKey: 'rebound',
+    name: 'S4 — Rebond Clinique',
+    desc: 'Patient en cours de stabilisation après un épisode critique. Le système désescalade progressivement : réduit la fréquence ECG et libère les ressources.',
+    severity: 'moderate', network: 'high', device: 'tablet',
+    qos: {
+      latency:  { target: '≤ 400ms',  sla: 400  },
+      ecgHz:    { target: '≥ 200 Hz', sla: 200  },
+      uptime:   { target: '≥ 99.5%',  sla: 99.5 },
+      bw:       { target: '≥ 32 Kbps',sla: 32   },
+    },
+    color: '#38bdf8',
   },
   {
-    id: 'R5', priority: 5,
-    cond: (s,n,d) => s==='stable' && n==='low',
-    label: 'IF patient=Stable AND réseau=Dégradé → Mode économie bande passante',
-    result: 'ECG 125 Hz, PA et Resp suspendus',
-    config: { ecgHz:'125 Hz', spo2:'60 s', temp:'120 s', bp:'SUSPENDU', resp:'SUSPENDU', compression:'Max', alert:'Aucune', adaptMode:'Dégradé' }
+    id: 4, key: 'saturation', simKey: 'saturation',
+    name: 'S5 — Saturation Totale',
+    desc: 'Triple contrainte : patient critique + réseau dégradé (< 6 Kbps) + IoT limité. Cas le plus dur — le moteur applique la règle de survie minimale garantie.',
+    severity: 'critical', network: 'low', device: 'iot',
+    qos: {
+      latency:  { target: '≤ 300ms',  sla: 300  },
+      ecgHz:    { target: '≥ 125 Hz', sla: 125  },
+      uptime:   { target: '≥ 98%',    sla: 98   },
+      bw:       { target: '≥ 4 Kbps', sla: 4    },
+    },
+    color: '#a78bfa',
   },
-  {
-    id: 'R6', priority: 6,
-    cond: (s,n,d) => s==='stable' && d==='iot',
-    label: 'IF patient=Stable AND dispositif=IoT → Mode faible consommation',
-    result: 'ECG 125 Hz, max 2 modules actifs simultanément',
-    config: { ecgHz:'125 Hz', spo2:'30 s', temp:'60 s', bp:'SUSPENDU', resp:'SUSPENDU', compression:'Élevée', alert:'Aucune', adaptMode:'IoT Économie' }
-  },
-  {
-    id: 'R7', priority: 7,
-    cond: (s,n,d) => s==='stable' && n==='high',
-    label: 'IF patient=Stable AND réseau=Haut débit → Mode optimal',
-    result: 'Tous les modules actifs à pleine résolution',
-    config: { ecgHz:'250 Hz', spo2:'30 s', temp:'60 s', bp:'5 min', resp:'15 s', compression:'Standard', alert:'Aucune', adaptMode:'Normal' }
-  },
-  {
-    id: 'R8', priority: 8,
-    cond: () => true,
-    label: 'DEFAULT → Mode standard de base',
-    result: 'Configuration par défaut (fallback)',
-    config: { ecgHz:'250 Hz', spo2:'30 s', temp:'60 s', bp:'5 min', resp:'15 s', compression:'Standard', alert:'Aucune', adaptMode:'Standard' }
-  }
 ];
 
-// ══════════════════════════════════════════════════════════════
-// HELPERS
-// ══════════════════════════════════════════════════════════════
+// ── RULES ──────────────────────────────────────────────────────
+const RULES = [
+  { id:'R1', cond:(s,n,d)=> s==='critical' && n!=='low',
+    label:'Critique + réseau OK',
+    action:'ECG 500 Hz · SpO₂ 1 s · ALARME SALLE',
+    config:{ ecgHz:500, spo2Int:1,  tempInt:5,  bp:'30 s',  resp:'1 s',  comp:'Élevée', alert:'ALARME SALLE', modules:6 }},
+  { id:'R2', cond:(s,n,d)=> s==='critical' && n==='low' && d!=='iot',
+    label:'Critique + réseau dégradé + Station/Tablette',
+    action:'ECG 250 Hz compressé · SpO₂ 1 s · PA et Resp suspendus · ALARME SALLE + SMS',
+    config:{ ecgHz:250, spo2Int:1,  tempInt:10, bp:'SUSPENDU', resp:'SUSPENDU', comp:'Maximale', alert:'ALARME + SMS', modules:3 }},
+  { id:'R3', cond:(s,n,d)=> s==='critical' && n==='low' && d==='iot',
+    label:'Critique + réseau dégradé + IoT — Survie minimale',
+    action:'ECG 125 Hz compressé · SpO₂ 2 s uniquement · ALARME MAX',
+    config:{ ecgHz:125, spo2Int:2,  tempInt:30, bp:'SUSPENDU', resp:'SUSPENDU', comp:'MAX',      alert:'ALARME MAX + SMS', modules:2 }},
+  { id:'R4', cond:(s,n,d)=> s==='moderate' && d==='station',
+    label:'Modéré + Station clinique',
+    action:'ECG 400 Hz · SpO₂ 5 s · alertes SMS + Appel',
+    config:{ ecgHz:400, spo2Int:5,  tempInt:10, bp:'2 min', resp:'5 s',  comp:'Élevée', alert:'SMS + Appel', modules:6 }},
+  { id:'R5', cond:(s,n,d)=> s==='moderate' && d==='tablet',
+    label:'Modéré + Tablette',
+    action:'ECG 250 Hz · SpO₂ 10 s · alertes SMS',
+    config:{ ecgHz:250, spo2Int:10, tempInt:30, bp:'5 min', resp:'RÉDUIT', comp:'Élevée', alert:'SMS', modules:4 }},
+  { id:'R6', cond:(s,n,d)=> s==='moderate' && d==='iot',
+    label:'Modéré + IoT — Ressources limitées',
+    action:'ECG 125 Hz · SpO₂ 15 s · PA + Resp suspendus · SMS',
+    config:{ ecgHz:125, spo2Int:15, tempInt:60, bp:'SUSPENDU', resp:'SUSPENDU', comp:'Maximale', alert:'SMS', modules:2 }},
+  { id:'R7', cond:(s,n,d)=> s==='stable' && n==='low',
+    label:'Stable + réseau dégradé — Économie bande passante',
+    action:'ECG 125 Hz · SpO₂ 60 s · PA + Resp suspendus',
+    config:{ ecgHz:125, spo2Int:60, tempInt:120,bp:'SUSPENDU', resp:'SUSPENDU', comp:'Max',      alert:'Aucune', modules:2 }},
+  { id:'R8', cond:()=> true,
+    label:'DEFAULT — Mode standard',
+    action:'ECG 250 Hz · SpO₂ 30 s · tous modules actifs',
+    config:{ ecgHz:250, spo2Int:30, tempInt:60, bp:'5 min', resp:'15 s', comp:'Standard', alert:'Aucune', modules:6 }},
+];
+
+// ── STATE ──────────────────────────────────────────────────────
+let currentScenario = null;
+let prevConfig      = null;
+let running         = false;
+let simTimer        = null;
+let cycleCount      = 0;
+let alertCount      = 0;
+let adaptCount      = 0;
+let slaOkCount      = 0;
+let latencies       = [];
+
+// ── HELPERS ────────────────────────────────────────────────────
+const el = id => document.getElementById(id);
 function r(a,b)    { return Math.floor(Math.random()*(b-a+1))+a; }
-function rf(a,b)   { return (Math.random()*(b-a)+a).toFixed(1); }
-function sleep(ms) { return new Promise(res => setTimeout(res, ms)); }
+function rf(a,b)   { return parseFloat((Math.random()*(b-a)+a).toFixed(1)); }
+function sleep(ms) { return new Promise(res=>setTimeout(res,ms)); }
 function now()     { return new Date().toLocaleTimeString('fr-FR'); }
-function el(id)    { return document.getElementById(id); }
 
-// ══════════════════════════════════════════════════════════════
-// CLOCK
-// ══════════════════════════════════════════════════════════════
-(function clock() {
-  function tick() { const e = el('scClock'); if(e) e.textContent = new Date().toLocaleTimeString('fr-FR'); }
-  tick(); setInterval(tick, 1000);
-})();
+// ── CLOCK ──────────────────────────────────────────────────────
+setInterval(()=>{ const e=el('scClock'); if(e) e.textContent=new Date().toLocaleTimeString('fr-FR'); },1000);
 
-// ══════════════════════════════════════════════════════════════
-// CONTEXT SELECTION
-// ══════════════════════════════════════════════════════════════
-function setCtx(btn, dim, val) {
-  ctx[dim] = val;
-  document.querySelectorAll(`[data-ctx="${dim}"]`).forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  updateCtxSummary();
-}
-
-function updateCtxSummary() {
-  const sLabel = { stable:'Stable', moderate:'Modérée', critical:'Critique' }[ctx.severity];
-  const nLabel = { high:'WiFi/5G', medium:'4G', low:'Dégradé' }[ctx.network];
-  const dLabel = { station:'Station', tablet:'Tablette', iot:'IoT' }[ctx.device];
-  const col    = { stable:'#4ade80', moderate:'#fbbf24', critical:'#f87171' }[ctx.severity];
-  el('ctxSummary').innerHTML =
-    `Situation : <strong style="color:${col}">${sLabel}</strong> · Réseau : <strong>${nLabel}</strong> · Dispositif : <strong>${dLabel}</strong>`;
-}
-updateCtxSummary();
-
-// ══════════════════════════════════════════════════════════════
-// TERMINAL
-// ══════════════════════════════════════════════════════════════
-function log(type, msg) {
+// ── TERMINAL ───────────────────────────────────────────────────
+function log(cls, msg) {
   const t = el('scTerminal'); if(!t) return;
   const d = document.createElement('div');
-  d.className = `term-line term-${type}`;
+  d.className = 'tl ' + cls;
   d.textContent = `${now()} ${msg}`;
   t.appendChild(d);
   t.scrollTop = t.scrollHeight;
-  if(t.children.length > 200) t.removeChild(t.firstChild);
+  if(t.children.length > 300) t.removeChild(t.firstChild);
 }
-function clearTerm() { const t=el('scTerminal'); if(t){t.innerHTML='';} log('sys','[SYS] Journal vidé.'); }
+function clrTerm() { const t=el('scTerminal'); if(t){t.innerHTML='';} log('ts','[SYS] Journal vidé.'); }
 
-// ══════════════════════════════════════════════════════════════
-// PIPELINE STEP HELPERS
-// ══════════════════════════════════════════════════════════════
-function setPipeStep(n, cls) {
-  el(`pstep-${n}`).className = 'pipe-step ' + (cls ? 'ps-'+cls : '');
-  el(`cntStep`).textContent = ['Objectif','Métrique','Situation','Décision','Adaptation'][n-1] || '—';
-}
-function resetPipe() {
-  for(let i=1;i<=5;i++) setPipeStep(i,'');
-  el(`cntStep`).textContent = '—';
-}
-function setPanelState(n, state) {
-  el(`panel-${n}`).className = 'sc-panel ' + (state ? 'panel-'+state : '');
-}
-function fillProgress(n, pct) {
-  el(`pf-${n}`).style.width = pct + '%';
+// ── SCENARIO SELECTION ──────────────────────────────────────────
+function pickScenario(idx) {
+  currentScenario = SCENARIOS[idx];
+  document.querySelectorAll('.scen-card').forEach((c,i)=>c.classList.toggle('sc-active', i===idx));
+  log('ts', `[SYS] Scénario sélectionné : ${currentScenario.name}`);
+  log('ts', `[SYS] ${currentScenario.desc}`);
+  // Pre-fill QoS targets
+  fillQoSTargets(currentScenario);
+  // Update Grafana link
+  const gl = el('grafanaLink');
+  if(gl) gl.href = PrometheusClient.getGrafanaURL('heart_rate');
 }
 
-async function flyPacket(n, color) {
-  const pkt = el(`cpkt-${n}`);
-  if(!pkt) return;
-  pkt.className = 'conn-packet fly' + (color ? ' fly-'+color : '');
-  await sleep(750);
-  pkt.className = 'conn-packet';
-}
-
-function waitStep() {
-  if(!stepMode) return Promise.resolve();
-  return new Promise(res => { stepResolve = res; });
-}
-
-// ══════════════════════════════════════════════════════════════
-// STEP 1 — OBJECTIF
-// ══════════════════════════════════════════════════════════════
-async function runObjectif(vitals, netD, devD, rule) {
-  log('obj', '[OBJ] ── Étape 1 : Définition des objectifs');
-  setPipeStep(1, 'active');
-  setPanelState(1, 'active');
-
-  // Animate progress bar
-  for(let p=0;p<=100;p+=5) { fillProgress(1,p); await sleep(20); }
-
-  const isCrit  = ctx.severity === 'critical';
-  const isWarn  = ctx.severity === 'moderate';
-
-  // Highlight relevant objective card
-  document.querySelectorAll('.obj-card').forEach(c => c.classList.remove('oc-active'));
-  const primary = isCrit ? 'obj-clinical' : (ctx.network==='low' ? 'obj-network' : 'obj-clinical');
-  el(primary)?.classList.add('oc-active');
-
-  el('oppVal').textContent = isCrit
-    ? '🔴 CRITIQUE — Signalement immédiat, aucune donnée sacrifiée'
-    : isWarn
-    ? '🟡 MODÉRÉ — Surveillance accrue, optimisation bande passante'
-    : '🟢 STANDARD — Équilibre qualité / consommation réseau';
-
-  log('obj', `[OBJ] Objectif principal : ${rule.adaptMode} → ${rule.result}`);
-  await sleep(400);
-  await waitStep();
-
-  setPipeStep(1, 'done');
-  setPanelState(1, 'done');
-  flyPacket(1, isCrit ? 'alert' : isWarn ? 'warn' : '');
-  await sleep(300);
-}
-
-// ══════════════════════════════════════════════════════════════
-// STEP 2 — MÉTRIQUE
-// ══════════════════════════════════════════════════════════════
-async function runMetrique(vitals, netD, devD) {
-  log('met', '[MET] ── Étape 2 : Collecte des métriques');
-  setPipeStep(2, 'active');
-  setPanelState(2, 'active');
-
-  const isCrit = ctx.severity === 'critical';
-  const isWarn = ctx.severity === 'moderate';
-
-  const setMV = (id, val, unit, pct, cls) => {
-    el(`mv-${id}`).textContent  = val;
-    el(`mf-${id}`).style.width  = pct + '%';
-    el(`mf-${id}`).style.background = cls==='crit'?'#f87171':cls==='warn'?'#fbbf24':'#38bdf8';
-    el(`met-${id}`).className   = `metric-box mb-${cls}`;
-  };
-
-  // Animate each metric appearing
-  for(let p=0;p<=100;p+=10) { fillProgress(2,p); await sleep(15); }
-
-  const hrPct   = Math.min(100, (vitals.hr / 160) * 100);
-  const spoPct  = Math.max(0, (vitals.spo2 - 80) / 20 * 100);
-  const tmpPct  = Math.min(100, ((vitals.temp - 35) / 6) * 100);
-  const bpPct   = Math.min(100, ((vitals.sbp - 90) / 120) * 100);
-  const rspPct  = Math.min(100, (vitals.resp / 40) * 100);
-  const scoPct  = Math.min(100, (vitals.score / 10) * 100);
-
-  const hcls  = isCrit?'crit':isWarn?'warn':'ok';
-  const spcls = vitals.spo2 < 92 ? 'crit' : vitals.spo2 < 95 ? 'warn' : 'ok';
-  const tcls  = parseFloat(vitals.temp)>39?'crit':parseFloat(vitals.temp)>38.2?'warn':'ok';
-
-  setMV('hr',   vitals.hr,     'bpm',     hrPct,  hcls);
-  setMV('spo2', vitals.spo2,   '%',       spoPct, spcls);
-  setMV('temp', vitals.temp,   '°C',      tmpPct, tcls);
-  setMV('bp',   `${vitals.sbp}/${vitals.dbp}`, 'mmHg', bpPct, hcls);
-  setMV('resp', vitals.resp,   'r/min',   rspPct, hcls);
-  setMV('score',vitals.score,  '/10',     scoPct, isCrit?'crit':isWarn?'warn':'ok');
-
-  // Contextual metrics
-  const nMeta = netD; const dMeta = devD;
-  const bw = nMeta.bw();  const cpu = dMeta.cap();
-  const nCls = ctx.network==='high'?'ok':ctx.network==='medium'?'warn':'low';
-  const dCls = ctx.device==='station'?'ok':ctx.device==='tablet'?'warn':'low';
-
-  el('cmv-net').textContent = nMeta.label; el('cms-net').textContent = ctx.network==='high'?'Excellent':ctx.network==='medium'?'Correct':'Dégradé';
-  el('cmv-dev').textContent = dMeta.label; el('cms-dev').textContent = `${dMeta.modules} modules max`;
-  el('cmv-bw').textContent  = bw;          el('cms-bw').textContent  = 'Kbps';
-  el('cmv-cpu').textContent = cpu;
-  ['ctxm-net','ctxm-dev','ctxm-bw','ctxm-cpu'].forEach((id,i) => {
-    el(id).className = 'ctx-met-card ' + ['cmc-'+nCls,'cmc-'+dCls,'cmc-'+nCls,'cmc-ok'][i];
+function fillQoSTargets(sc) {
+  const q = sc.qos;
+  el('sla-latency-target').textContent = q.latency.target;
+  el('sla-freq-target').textContent    = q.ecgHz.target;
+  el('sla-uptime-target').textContent  = q.uptime.target;
+  el('sla-bw-target').textContent      = q.bw.target;
+  el('sla-latency-meas').textContent   = 'Non mesuré';
+  el('sla-freq-meas').textContent      = 'Non mesuré';
+  el('sla-uptime-meas').textContent    = 'Non mesuré';
+  el('sla-bw-meas').textContent        = 'Non mesuré';
+  ['latency','freq','uptime','bw'].forEach(k=>{
+    const b = el('sla-'+k+'-badge');
+    if(b) { b.textContent='—'; b.className='sla-badge'; }
   });
-
-  log('met', `[MET] Clinique → HR:${vitals.hr} SpO₂:${vitals.spo2}% T:${vitals.temp}°C PA:${vitals.sbp}/${vitals.dbp}`);
-  log('met', `[MET] Contexte → Réseau:${nMeta.label} BW:${bw}Kbps  Dispositif:${dMeta.label} CPU:${cpu}%`);
-  await sleep(400);
-  await waitStep();
-
-  setPipeStep(2, 'done');
-  setPanelState(2, 'done');
-  flyPacket(2, isCrit?'alert':isWarn?'warn':'');
-  await sleep(300);
-  return { bw, cpu };
+  el('slacScore').textContent = '—';
+  el('slacDetail').textContent = 'Lancez la simulation pour mesurer.';
+  el('qosScenDesc').textContent = sc.desc;
 }
 
-// ══════════════════════════════════════════════════════════════
-// STEP 3 — SITUATION
-// ══════════════════════════════════════════════════════════════
-async function runSituation(vitals, bw, cpu) {
-  log('sit', '[SIT] ── Étape 3 : Évaluation de la situation globale');
-  setPipeStep(3, isAlert()?'alert':isWarn()?'warn':'active');
-  setPanelState(3, 'active');
-
-  for(let p=0;p<=100;p+=8) { fillProgress(3,p); await sleep(18); }
-
-  const isCrit = ctx.severity === 'critical';
-  const isWrn  = ctx.severity === 'moderate';
-  const netBad = ctx.network === 'low';
-  const devWeak= ctx.device  === 'iot';
-
-  // Clinical score
-  const clinScore = isCrit ? r(78,95) : isWrn ? r(42,65) : r(10,28);
-  const netScore  = ctx.network==='high' ? r(82,98) : ctx.network==='medium' ? r(45,68) : r(8,25);
-  const devScore  = ctx.device==='station' ? r(85,99) : ctx.device==='tablet' ? r(50,75) : r(15,38);
-  const totalPct  = Math.round((clinScore*0.6 + netScore*0.25 + devScore*0.15));
-
-  // Animate bars
-  const animate = async (fillId, targetPct, color) => {
-    const fill = el(fillId); if(!fill) return;
-    fill.style.background = color;
-    for(let p=0;p<=targetPct;p+=3) { fill.style.width=p+'%'; await sleep(12); }
-    fill.style.width = targetPct + '%';
-  };
-  await Promise.all([
-    animate('smf-clinical', clinScore, isCrit?'#f87171':isWrn?'#fbbf24':'#4ade80'),
-    animate('smf-network',  netScore,  netBad?'#f87171':ctx.network==='medium'?'#fbbf24':'#38bdf8'),
-    animate('smf-device',   devScore,  devWeak?'#f87171':ctx.device==='tablet'?'#fbbf24':'#4ade80'),
-    animate('smf-total',    totalPct,  isCrit?'#f87171':isWrn?'#fbbf24':'#4ade80'),
-  ]);
-
-  el('smr-clinical').textContent = clinScore+'%';
-  el('smr-network').textContent  = netScore+'%';
-  el('smr-device').textContent   = devScore+'%';
-  el('smr-total').textContent    = totalPct+'%';
-
-  // Global situation
-  let sitName, sitDesc, sitCls;
-  if(isCrit) {
-    sitName = '🔴 Situation Critique';
-    sitDesc = netBad
-      ? 'Patient en danger immédiat + réseau dégradé → protocole d\'urgence maximal'
-      : 'Patient en danger immédiat → intervention médicale requise sans délai';
-    sitCls = 'sg-crit';
-  } else if(isWrn) {
-    sitName = devWeak ? '🟠 Situation Modérée Contrainte' : '🟡 Situation Modérée';
-    sitDesc = devWeak
-      ? 'Surveillance accrue nécessaire mais dispositif limité → compromis qualité/ressource'
-      : 'État préoccupant nécessitant une surveillance renforcée et des alertes préventives';
-    sitCls = 'sg-warn';
-  } else {
-    sitName = netBad ? '🟡 Situation Normale Dégradée' : '🟢 Situation Normale';
-    sitDesc = netBad
-      ? 'Patient stable mais connexion dégradée → adapter la collecte pour maintenir la surveillance'
-      : 'Tous les paramètres sont dans les normes — fonctionnement optimal';
-    sitCls = 'sg-ok';
-  }
-
-  el('sgName').textContent = sitName;
-  el('sgDesc').textContent = sitDesc;
-  el('sitGlobal').className = 'situation-global ' + sitCls;
-
-  // Flags
-  const flags = [];
-  if(isCrit)   flags.push({t:'CRITIQUE : SpO₂ < 92%', c:'sf-crit'});
-  if(isWrn)    flags.push({t:'MODÉRÉ : Paramètres anormaux', c:'sf-warn'});
-  if(!isCrit&&!isWrn) flags.push({t:'Patient Stable', c:'sf-ok'});
-  if(netBad)   flags.push({t:'Réseau dégradé < 20 Kbps', c:'sf-warn'});
-  if(!netBad)  flags.push({t:'Réseau nominal', c:'sf-ok'});
-  if(devWeak)  flags.push({t:'Dispositif IoT limité', c:'sf-warn'});
-  if(!devWeak) flags.push({t:'Dispositif suffisant', c:'sf-ok'});
-
-  el('sitFlags').innerHTML = flags.map(f=>`<span class="sf-flag ${f.c}">${f.t}</span>`).join('');
-
-  log('sit', `[SIT] Situation : ${sitName} — Score global : ${totalPct}%`);
-  log('sit', `[SIT] ${flags.map(f=>f.t).join(' | ')}`);
-  await sleep(400);
-  await waitStep();
-
-  setPipeStep(3, isCrit?'alert':isWrn?'warn':'done');
-  setPanelState(3, isCrit?'alert':isWrn?'warn':'done');
-  flyPacket(3, isCrit?'alert':isWrn?'warn':'');
-  await sleep(300);
-}
-
-// ══════════════════════════════════════════════════════════════
-// STEP 4 — DÉCISION
-// ══════════════════════════════════════════════════════════════
-async function runDecision(rule) {
-  log('dec', '[DEC] ── Étape 4 : Évaluation du moteur de règles');
-  setPipeStep(4, isAlert()?'alert':isWarn()?'warn':'active');
-  setPanelState(4, 'active');
-
-  el('rulesTotal').textContent = RULES.length;
-
-  // Build rules list HTML
-  el('rulesList').innerHTML = RULES.map(rl => `
-    <div class="rule-item" id="ri-${rl.id}">
-      <span class="ri-icon">⬜</span>
-      <div class="ri-body">
-        <div class="ri-cond">${rl.label}</div>
-        <div class="ri-result">${rl.result}</div>
-      </div>
-      <span class="ri-badge" id="rib-${rl.id}">—</span>
-    </div>`).join('');
-
-  let evalCount = 0;
-  let firedRule = null;
-
-  for(const rl of RULES) {
-    if(!running && !stepMode) break;
-    const item   = el(`ri-${rl.id}`);
-    const badge  = el(`rib-${rl.id}`);
-    item.className = 'rule-item ri-checking';
-    item.querySelector('.ri-icon').textContent = '🔍';
-    el('rulesEval').textContent = ++evalCount;
-    fillProgress(4, Math.round((evalCount/RULES.length)*100));
-    await sleep(220);
-
-    const pass = rl.cond(ctx.severity, ctx.network, ctx.device);
-    if(pass && !firedRule) {
-      firedRule = rl;
-      item.className  = 'rule-item ri-fired';
-      item.querySelector('.ri-icon').textContent = '✅';
-      badge.className = 'ri-badge rb-fire';
-      badge.textContent = 'DÉCLENCHÉ';
-    } else if(pass) {
-      item.className  = 'rule-item ri-pass';
-      item.querySelector('.ri-icon').textContent = '✓';
-      badge.className = 'ri-badge rb-pass';
-      badge.textContent = 'Vrai';
-    } else {
-      item.className  = 'rule-item ri-fail';
-      item.querySelector('.ri-icon').textContent = '✗';
-      badge.className = 'ri-badge rb-fail';
-      badge.textContent = 'Faux';
-    }
-  }
-
-  const fired = firedRule || RULES[RULES.length-1];
-  el('dfRule').textContent = `[${fired.id}] ${fired.label}`;
-  el('dfRationale').textContent = fired.result;
-
-  log('dec', `[DEC] ${evalCount} règles évaluées — Règle sélectionnée : ${fired.id}`);
-  log('dec', `[DEC] ${fired.label}`);
-  await sleep(400);
-  await waitStep();
-
-  setPipeStep(4, isAlert()?'alert':isWarn()?'warn':'done');
-  setPanelState(4, isAlert()?'alert':isWarn()?'warn':'done');
-  flyPacket(4, isAlert()?'alert':isWarn()?'warn':'');
-  await sleep(300);
-  return fired;
-}
-
-// ══════════════════════════════════════════════════════════════
-// STEP 5 — ADAPTATION
-// ══════════════════════════════════════════════════════════════
-async function runAdaptation(rule) {
-  log('adp', '[ADP] ── Étape 5 : Application de la reconfiguration');
-  setPipeStep(5, isAlert()?'alert':isWarn()?'warn':'active');
-  setPanelState(5, 'active');
-
-  const newCfg = rule.config;
-  const defCfg = prevConfig || { ecgHz:'250 Hz', spo2:'30 s', temp:'60 s', bp:'5 min', resp:'15 s', compression:'Standard', alert:'Aucune', adaptMode:'Standard' };
-
-  // Before / After comparison
-  const keys = ['ecgHz','spo2','temp','bp','resp','compression','alert'];
-  const labels= { ecgHz:'ECG', spo2:'SpO₂', temp:'Température', bp:'Pression art.', resp:'Respiration', compression:'Compression', alert:'Alerte' };
-
-  for(let p=0;p<=100;p+=6) { fillProgress(5,p); await sleep(15); }
-
-  el('configBefore').innerHTML = keys.map(k=>{
-    const changed = defCfg[k] !== newCfg[k];
-    return `<div class="ac-item ${changed?'ai-changed':'ai-same'}">
-      <span class="ai-key">${labels[k]}</span>
-      <span class="ai-val">${defCfg[k]||'—'}</span>
-    </div>`;
-  }).join('');
-
-  el('configAfter').innerHTML = keys.map(k=>{
-    const changed = defCfg[k] !== newCfg[k];
-    const valCls  = newCfg[k]==='SUSPENDU'?'val-warn':isAlert()?'val-crit':isWarn()?'val-warn':'';
-    return `<div class="ac-item ${changed?'ai-changed':'ai-same'}">
-      <span class="ai-key">${labels[k]}</span>
-      <span class="ai-val ${valCls}">${newCfg[k]}</span>
-    </div>`;
-  }).join('');
-
-  // Modules status
-  const modules = [
-    { name:'ECG', freq: newCfg.ecgHz, status: newCfg.ecgHz==='SUSPENDU'?'off':'on', cls: isAlert()?'crit':'on' },
-    { name:'SpO₂', freq: newCfg.spo2, status: 'on', cls:'on' },
-    { name:'Température', freq: newCfg.temp, status: 'on', cls:'on' },
-    { name:'Pression art.', freq: newCfg.bp, status: newCfg.bp==='SUSPENDU'?'off':newCfg.bp==='RÉDUIT'?'reduced':'on', cls: newCfg.bp==='SUSPENDU'?'off':newCfg.bp==='RÉDUIT'?'reduced':'on' },
-    { name:'Respiration', freq: newCfg.resp, status: newCfg.resp==='SUSPENDU'?'off':newCfg.resp==='RÉDUIT'?'reduced':'on', cls: newCfg.resp==='SUSPENDU'?'off':newCfg.resp==='RÉDUIT'?'reduced':'on' },
-    { name:'Moteur d\'alertes', freq: newCfg.alert, status: newCfg.alert==='Aucune'?'off':'on', cls: isAlert()?'crit':newCfg.alert==='Aucune'?'off':'on' }
-  ];
-
-  const statusLabel = { on:'Actif', off:'Suspendu', reduced:'Réduit', crit:'Actif MAX' };
-  el('amGrid').innerHTML = modules.map(m => `
-    <div class="am-row amr-${m.cls}">
-      <span class="am-name">${m.name}</span>
-      <span class="am-status">${statusLabel[m.cls]||'Actif'}</span>
-      <span class="am-freq">${m.freq}</span>
-    </div>`).join('');
-
-  // Notification zone
-  const isCrit = ctx.severity==='critical';
-  const isWrn  = ctx.severity==='moderate';
-  const notifCls = isCrit?'an-crit':isWrn?'an-warn':'an-ok';
-  const notifIcon = isCrit?'🚨':isWrn?'⚠️':'✅';
-  const notifTitle = isCrit?'ALARME CRITIQUE — Médecin notifié immédiatement':isWrn?'Alerte modérée — SMS + Appel envoyés':'Surveillance normale — Aucune alerte';
-  const notifDetail = `Mode : ${newCfg.adaptMode} · ECG ${newCfg.ecgHz} · Compression : ${newCfg.compression}`;
-
-  el('adaptNotif').className   = `adapt-notification ${notifCls}`;
-  el('anIcon').textContent     = notifIcon;
-  el('anTitle').textContent    = notifTitle;
-  el('anDetail').textContent   = notifDetail;
-  el('anChannel').textContent  = newCfg.alert;
-
-  el('loopCycleNum').textContent = cycleCount;
-
-  if(isCrit) alertCount++;
-  adaptCount++;
-
-  prevConfig = { ...newCfg };
-
-  log('adp', `[ADP] Mode ${newCfg.adaptMode} appliqué — ECG:${newCfg.ecgHz} Compression:${newCfg.compression}`);
-  log('adp', `[ADP] Canal alerte : ${newCfg.alert}`);
-  if(isCrit) log('crit','[CRIT] ⚠ ALARME SALLE déclenchée — Dr. Martin notifiée');
-
-  await sleep(400);
-  await waitStep();
-
-  setPipeStep(5, isCrit?'alert':isWrn?'warn':'done');
-  setPanelState(5, isCrit?'alert':isWrn?'warn':'done');
-  await sleep(300);
-}
-
-// ══════════════════════════════════════════════════════════════
-// COUNTERS
-// ══════════════════════════════════════════════════════════════
-function updateCounters(ms) {
-  latencies.push(ms);
-  if(latencies.length>30) latencies.shift();
-  const avg = Math.round(latencies.reduce((a,b)=>a+b,0)/latencies.length);
-  el('cntCycles').textContent  = cycleCount;
-  el('cntLatency').textContent = avg + 'ms';
-  el('cntAlerts').textContent  = alertCount;
-  el('cntAdapt').textContent   = adaptCount;
-}
-
-// ══════════════════════════════════════════════════════════════
-// HELPERS
-// ══════════════════════════════════════════════════════════════
-function isAlert() { return ctx.severity === 'critical'; }
-function isWarn()  { return ctx.severity === 'moderate'; }
-
-function getBestRule() {
-  for(const rl of RULES) {
-    if(rl.cond(ctx.severity, ctx.network, ctx.device)) return rl;
-  }
-  return RULES[RULES.length-1];
-}
-
-// ══════════════════════════════════════════════════════════════
-// MAIN CYCLE
-// ══════════════════════════════════════════════════════════════
-async function runCycle() {
-  const tStart = Date.now();
-  cycleCount++;
-
-  log('sys', `══ Cycle #${cycleCount} — Contexte: ${ctx.severity}/${ctx.network}/${ctx.device} ══`);
-
-  resetPipe();
-  [1,2,3,4,5].forEach(n => { fillProgress(n,0); setPanelState(n,''); });
-
-  const vitals = VITALS[ctx.severity]();
-  const netD   = NET_DATA[ctx.network];
-  const devD   = DEV_DATA[ctx.device];
-  const rule   = getBestRule();
-
-  await runObjectif(vitals, netD, devD, rule);
-  if(!running && !stepMode) return;
-
-  const { bw, cpu } = await runMetrique(vitals, netD, devD);
-  if(!running && !stepMode) return;
-
-  await runSituation(vitals, bw, cpu);
-  if(!running && !stepMode) return;
-
-  const firedRule = await runDecision(rule);
-  if(!running && !stepMode) return;
-
-  await runAdaptation(firedRule);
-
-  const ms = Date.now() - tStart;
-  updateCounters(ms);
-  log('sys', `══ Cycle #${cycleCount} terminé — ${ms}ms total ══`);
-}
-
-// ══════════════════════════════════════════════════════════════
-// START / STOP / STEP
-// ══════════════════════════════════════════════════════════════
-function startSim() {
+// ── START / STOP ────────────────────────────────────────────────
+async function startScenario() {
   if(running) return;
-  running   = true;
-  stepMode  = false;
+  if(!currentScenario) { pickScenario(0); }
+  running = true;
 
   el('btnRun').disabled  = true;
   el('btnStop').disabled = false;
-  el('btnStep').disabled = true;
-
-  const dot = document.querySelector('.sim-dot');
-  dot.className = 'sim-dot running';
+  el('simDot').className = 'sim-dot sd-run';
   el('simLabel').textContent = 'En cours';
 
-  log('sys','[SYS] ══ SIMULATION DÉMARRÉE ══');
-  updateCtxSummary();
-
-  const interval = ctx.severity==='critical' ? 3000 : ctx.severity==='moderate' ? 5000 : 7000;
+  log('ts', `[SYS] ══ SIMULATION DÉMARRÉE — ${currentScenario.name} ══`);
 
   function loop() {
     if(!running) return;
-    runCycle().then(() => {
-      if(running) simTimer = setTimeout(loop, interval);
+    runFullCycle().then(()=>{
+      if(running) simTimer = setTimeout(loop, currentScenario.severity==='critical' ? 3500 : 6000);
     });
   }
   loop();
 }
 
-function stopSim() {
+function stopScenario() {
   running = false;
   clearTimeout(simTimer);
-  if(stepResolve) { stepResolve(); stepResolve = null; }
-
   el('btnRun').disabled  = false;
   el('btnStop').disabled = true;
-  el('btnStep').disabled = false;
-
-  const dot = document.querySelector('.sim-dot');
-  dot.className = 'sim-dot idle';
+  el('simDot').className = 'sim-dot';
   el('simLabel').textContent = 'Arrêté';
-
-  log('sys',`[SYS] Simulation arrêtée — ${cycleCount} cycles — ${alertCount} alertes — ${adaptCount} adaptations`);
+  log('ts', `[SYS] Simulation arrêtée — ${cycleCount} cycles · ${alertCount} alertes · ${adaptCount} adaptations`);
 }
 
-async function stepOnce() {
-  if(running) return;
-  stepMode  = true;
+// ── PROMETHEUS CONNECT ──────────────────────────────────────────
+async function connectPrometheus() {
+  const ep = el('promEndpoint')?.value || 'http://localhost:9090';
+  PrometheusClient.setEndpoint(ep);
+  log('ts', `[PROM] Tentative de connexion → ${ep}`);
+  const ok = await PrometheusClient.testConnection(ep);
+  log(ok ? 'tp' : 'tw', ok ? `[PROM] ✓ Connecté à Prometheus : ${ep}` : '[PROM] ✗ Prometheus non joignable — simulation activée');
+}
 
-  el('btnRun').disabled  = true;
-  el('btnStop').disabled = false;
-  el('btnStep').textContent = '⏭ Étape suivante';
-
-  const dot = document.querySelector('.sim-dot');
-  dot.className = 'sim-dot running';
-  el('simLabel').textContent = 'Pas à pas';
-
-  // One full cycle, step by step
-  stepResolve = null;
-  const tStart = Date.now();
+// ══════════════════════════════════════════════════════════════
+// FULL CYCLE
+// ══════════════════════════════════════════════════════════════
+async function runFullCycle() {
+  const t0 = Date.now();
   cycleCount++;
+  const sc = currentScenario;
+  log('ts', `── Cycle #${cycleCount} [${sc.name}] ──`);
 
-  log('sys',`══ Cycle #${cycleCount} [PAS À PAS] ══`);
+  // Progress bars reset
+  for(let i=1;i<=5;i++) { el(`ppbf${i}`).style.width='0%'; el(`ppb${i}`).className='ppb-step'; }
 
-  resetPipe();
-  [1,2,3,4,5].forEach(n => { fillProgress(n,0); setPanelState(n,''); });
+  // ── FETCH MÉTRIQUES (Prometheus ou simulation) ──────────────
+  activateStep(1);
+  const metrics = await PrometheusClient.getMetrics(sc.simKey);
+  el('promQuery').textContent = PrometheusClient.getPromQLForDisplay('heart_rate') + ' …';
+  await animProg(1, 600);
 
-  const vitals = VITALS[ctx.severity]();
-  const netD   = NET_DATA[ctx.network];
-  const devD   = DEV_DATA[ctx.device];
-  const rule   = getBestRule();
+  // ── ÉTAPE 1 : OBJECTIF ─────────────────────────────────────
+  log('to', `[OBJ] Objectifs QoS — Latence: ${sc.qos.latency.target} · ECG: ${sc.qos.ecgHz.target} · BW: ${sc.qos.bw.target}`);
 
-  // Create a step-by-step runner
-  const steps = [
-    () => runObjectif(vitals, netD, devD, rule),
-    () => runMetrique(vitals, netD, devD),
-    () => runSituation(vitals, 0, 0),
-    () => runDecision(rule),
-    async () => {
-      const firedRule = getBestRule();
-      await runAdaptation(firedRule);
-      updateCounters(Date.now()-tStart);
-      log('sys',`══ Cycle #${cycleCount} terminé ══`);
-      el('btnRun').disabled  = false;
-      el('btnStop').disabled = true;
-      el('btnStep').textContent = '⏭ Étape par étape';
-      dot.className = 'sim-dot idle';
-      el('simLabel').textContent = 'Prêt';
-      stepMode = false;
-    }
+  // ── ÉTAPE 2 : MÉTRIQUES interprétées ───────────────────────
+  activateStep(2);
+  await animProg(2, 700);
+  renderMetrics(metrics, sc);
+  log('tm', `[MET] HR:${metrics.heart_rate} SpO₂:${metrics.spo2}% T:${metrics.temperature}°C PA:${metrics.systolic_bp}/${metrics.diastolic_bp} Resp:${metrics.respiratory_rate} BW:${metrics.network_bw}Kbps`);
+  doneStep(1); doneStep(2);
+
+  // ── ÉTAPE 3 : SITUATION ─────────────────────────────────────
+  activateStep(3);
+  await animProg(3, 600);
+  const situation = classifySituation(metrics, sc);
+  renderSituation(situation, metrics, sc);
+  log('ts3', `[SIT] Situation : ${situation.name} — Score: ${situation.score}%`);
+  doneStep(3);
+
+  // ── ÉTAPE 4 : DÉCISION ──────────────────────────────────────
+  activateStep(4);
+  await animProg(4, 700);
+  const rule = selectRule(sc.severity, sc.network, sc.device);
+  renderDecision(rule, situation, sc);
+  log('td', `[DEC] Règle déclenchée : ${rule.id} — ${rule.label}`);
+  doneStep(4);
+
+  // ── ÉTAPE 5 : ADAPTATION avant/après ────────────────────────
+  activateStep(5);
+  await animProg(5, 600);
+  const measuredLatency = metrics.alert_latency_ms || r(120, 280);
+  const adaptResult = renderAdaptation(rule, metrics, measuredLatency, sc);
+  log('ta', `[ADP] ${rule.action}`);
+
+  // ── PREUVE : SLA/QoS mesurés ────────────────────────────────
+  measureSLA(metrics, rule, measuredLatency, sc);
+
+  // ── PREUVE 1 : Métriques → Situations ───────────────────────
+  provePoint1(situation, metrics);
+  // ── PREUVE 2 : Situations → SLA ─────────────────────────────
+  provePoint2(situation, sc, adaptResult.slaOk);
+  // ── PREUVE 3 : avant/après mesurable ────────────────────────
+  provePoint3(adaptResult);
+
+  doneStep(5);
+
+  const ms = Date.now() - t0;
+  latencies.push(ms);
+  if(latencies.length > 30) latencies.shift();
+  const avg = Math.round(latencies.reduce((a,b)=>a+b,0)/latencies.length);
+  if(adaptResult.slaOk) slaOkCount++;
+  if(situation.isAlert) alertCount++;
+  adaptCount++;
+
+  el('cntCycle').textContent   = cycleCount;
+  el('cntAlert').textContent   = alertCount;
+  el('cntAdapt').textContent   = adaptCount;
+  el('cntSLA').textContent     = Math.round((slaOkCount/cycleCount)*100)+'%';
+  el('cntDelta').textContent   = adaptResult.deltaEcg ? '+'+adaptResult.deltaEcg+'Hz' : '0Hz';
+  el('cntLatency').textContent = avg + 'ms';
+}
+
+// ══════════════════════════════════════════════════════════════
+// RENDER MÉTRIQUES
+// ══════════════════════════════════════════════════════════════
+function renderMetrics(m, sc) {
+  const isCrit = sc.severity === 'critical';
+  const isWarn = sc.severity === 'moderate';
+
+  const rows = [
+    { label:'Fréquence cardiaque', val:m.heart_rate,          unit:'bpm',     pct: Math.min(100,(m.heart_rate/160)*100),   cls: m.heart_rate>100?'crit':m.heart_rate>90?'warn':'ok', interp: m.heart_rate>120?'Tachycardie sévère':m.heart_rate>100?'Tachycardie':m.heart_rate<55?'Bradycardie':'Normal', promq:'heart_rate_bpm' },
+    { label:'SpO₂',               val:m.spo2,                 unit:'%',       pct: Math.max(0,(m.spo2-75)/25*100),         cls: m.spo2<90?'crit':m.spo2<95?'warn':'ok',             interp: m.spo2<88?'Hypoxie critique':m.spo2<92?'Hypoxie':m.spo2<95?'Limite':'Normal', promq:'spo2_percent' },
+    { label:'Température',        val:m.temperature,          unit:'°C',      pct: Math.min(100,(m.temperature-35)/6*100), cls: m.temperature>39?'crit':m.temperature>38.2?'warn':'ok', interp: m.temperature>39?'Hyperthermie':m.temperature>38.2?'Fièvre':'Normal', promq:'body_temperature_celsius' },
+    { label:'Pression systolique',val:m.systolic_bp,          unit:'mmHg',    pct: Math.min(100,(m.systolic_bp-80)/130*100),cls:m.systolic_bp>165?'crit':m.systolic_bp>140?'warn':'ok', interp:m.systolic_bp>165?'HTA grade 3':m.systolic_bp>140?'HTA grade 1':'Normal', promq:'blood_pressure_systolic' },
+    { label:'Fr. respiratoire',   val:m.respiratory_rate,     unit:'r/min',   pct: Math.min(100,(m.respiratory_rate/40)*100),cls:m.respiratory_rate>28?'crit':m.respiratory_rate>20?'warn':'ok', interp:m.respiratory_rate>28?'Détresse resp.':m.respiratory_rate>20?'Tachypnée':'Normal', promq:'respiratory_rate' },
+    { label:'Bande passante',     val:m.network_bw,           unit:'Kbps',    pct: Math.min(100,(m.network_bw/150)*100),   cls: m.network_bw<10?'crit':m.network_bw<30?'warn':'ok',  interp:m.network_bw<10?'Réseau dégradé critique':m.network_bw<30?'Réseau faible':'Réseau nominal', promq:'network_bandwidth_kbps' },
   ];
 
-  let stepIdx = 0;
-  el('btnStep').onclick = async () => {
-    if(stepResolve) { stepResolve(); stepResolve = null; }
-    else if(stepIdx < steps.length) { await steps[stepIdx++](); }
-  };
-  // Kick off first step
-  el('btnStep').click();
+  el('metricRows').innerHTML = rows.map(row=>`
+    <div class="met-row mr-${row.cls}" id="mr-${row.promq}">
+      <div class="mr-top">
+        <span class="mr-label">${row.label}</span>
+        <span class="mr-interp ic-${row.cls}">${row.interp}</span>
+      </div>
+      <div class="mr-val-line">
+        <span class="mr-val">${row.val}</span><span class="mr-unit">${row.unit}</span>
+        <div class="mr-bar"><div class="mr-fill mf-${row.cls}" style="width:${row.pct}%"></div></div>
+      </div>
+      <div class="mr-promq" onclick="showPromQL('${row.promq}')">
+        <span class="promq-label">PromQL:</span>
+        <code>${PrometheusClient.getPromQLForDisplay(row.promq).substring(0,42)}…</code>
+      </div>
+    </div>`).join('');
+
+  // Interprétation globale
+  const critCount = rows.filter(r=>r.cls==='crit').length;
+  const warnCount = rows.filter(r=>r.cls==='warn').length;
+  const interpLines = [
+    `• ${critCount} métrique(s) en zone critique, ${warnCount} en zone d'alerte.`,
+    critCount >= 2 ? `• Combinaison critique détectée → classification CRITIQUE` : warnCount >= 2 ? `• Plusieurs anomalies → classification MODÉRÉE` : `• Paramètres globalement normaux → classification STABLE`,
+    `• Réseau ${m.network_bw < 10 ? 'dégradé : compression des données requise' : m.network_bw < 30 ? 'faible : modules secondaires réduits' : 'nominal : tous modules actifs'}`,
+  ];
+  el('ibLines').innerHTML = interpLines.map(l=>`<div class="ibl">${l}</div>`).join('');
+}
+
+function showPromQL(key) {
+  el('promQuery').textContent = PrometheusClient.getPromQLForDisplay(key);
+  el('grafanaLink').href = PrometheusClient.getGrafanaURL(key);
+  log('tp', `[PROM] Query: ${PrometheusClient.getPromQLForDisplay(key)}`);
+}
+
+// ══════════════════════════════════════════════════════════════
+// CLASSIFY SITUATION
+// ══════════════════════════════════════════════════════════════
+function classifySituation(m, sc) {
+  const isCrit = sc.severity === 'critical';
+  const isWarn = sc.severity === 'moderate';
+  const netBad = sc.network  === 'low';
+  const devWeak= sc.device   === 'iot';
+
+  let name, code, color, score, reasons, isAlert;
+
+  if(isCrit && netBad && devWeak) {
+    name='Saturation Totale'; code='SIT-CRIT-5'; color='#f87171'; score=r(92,98); isAlert=true;
+    reasons=['SpO₂ < 90% → Hypoxie critique', 'Réseau < 10 Kbps → Compression forcée', 'IoT → 2 modules max', 'Score de risque global > 92%'];
+  } else if(isCrit && netBad) {
+    name='Critique Réseau Dégradé'; code='SIT-CRIT-4'; color='#f87171'; score=r(85,95); isAlert=true;
+    reasons=['État clinique critique (HR>120 ou SpO₂<90)', 'Réseau dégradé → compression max', 'PA et Resp suspendus pour économiser la BW'];
+  } else if(isCrit) {
+    name='État Critique Pur'; code='SIT-CRIT-3'; color='#ef4444'; score=r(80,92); isAlert=true;
+    reasons=['Paramètres vitaux hors normes', 'Réseau disponible → ECG 500 Hz maintenu', 'Tous les modules critiques actifs'];
+  } else if(isWarn && devWeak) {
+    name='Modéré Contraint IoT'; code='SIT-MOD-2'; color='#fb923c'; score=r(52,68); isAlert=true;
+    reasons=['Paramètres anormaux (FC > 100 ou T > 38°C)', 'Dispositif IoT : max 2 modules simultanés', 'Optimisation : ECG + SpO₂ uniquement'];
+  } else if(isWarn) {
+    name='État Modéré Surveillé'; code='SIT-MOD-1'; color='#fbbf24'; score=r(42,58); isAlert=true;
+    reasons=['FC ou SpO₂ hors norme standard', 'Ressources réseau suffisantes', 'Surveillance accrue déclenchée'];
+  } else if(netBad) {
+    name='Stable Réseau Dégradé'; code='SIT-STB-2'; color='#38bdf8'; score=r(22,38); isAlert=false;
+    reasons=['Paramètres vitaux stables', 'Réseau faible → réduction BW non-critiques', 'Mode économie activé'];
+  } else {
+    name='Situation Normale'; code='SIT-STB-1'; color='#4ade80'; score=r(5,22); isAlert=false;
+    reasons=['Tous paramètres dans les normes', 'Réseau nominal', 'Mode standard — tous modules actifs'];
+  }
+
+  return { name, code, color, score, reasons, isAlert };
+}
+
+function renderSituation(sit, m, sc) {
+  const nb = el('sitNameBox');
+  nb.style.borderColor = sit.color;
+  nb.style.background  = sit.color+'18';
+  el('snbName').textContent = sit.name;
+  el('snbName').style.color = sit.color;
+  el('snbCode').textContent = sit.code;
+
+  el('sitFactors').innerHTML = sit.reasons.map((r,i)=>`
+    <div class="sf-row">
+      <span class="sf-bullet" style="color:${sit.color}">▸</span>
+      <span class="sf-text">${r}</span>
+    </div>`).join('');
+
+  el('splBody').innerHTML =
+    `<code>${m.spo2}% SpO₂ + ${m.heart_rate}bpm</code> → interprétés comme <strong style="color:${sit.color}">${sit.name}</strong><br/>
+     Score de risque composite : <strong>${sit.score}%</strong>`;
+}
+
+// ══════════════════════════════════════════════════════════════
+// SELECT RULE
+// ══════════════════════════════════════════════════════════════
+function selectRule(severity, network, device) {
+  for(const rl of RULES) { if(rl.cond(severity,network,device)) return rl; }
+  return RULES[RULES.length-1];
+}
+
+function renderDecision(rule, sit, sc) {
+  el('rfbId').textContent     = rule.id;
+  el('rfbId').style.color     = sit.color;
+  el('rfbCond').textContent   = rule.label;
+  el('rfbAction').textContent = rule.action;
+
+  // show evaluated rules chain
+  el('ruleChain').innerHTML = RULES.map(rl=>{
+    const fired  = rl.id === rule.id;
+    const passed = rl.cond(sc.severity, sc.network, sc.device);
+    return `<div class="rc-row ${fired?'rc-fired':passed?'rc-pass':'rc-fail'}">
+      <span class="rc-id">${rl.id}</span>
+      <span class="rc-lbl">${rl.label}</span>
+      <span class="rc-badge">${fired?'✅ DÉCLENCHÉ':passed?'✓':'✗'}</span>
+    </div>`;
+  }).join('');
+
+  el('decProofBody').innerHTML =
+    `Situation <strong>${sit.name}</strong><br/>
+     → SLA cible latence : <strong>${sc.qos.latency.target}</strong><br/>
+     → SLA cible ECG : <strong>${sc.qos.ecgHz.target}</strong><br/>
+     → Règle <strong>${rule.id}</strong> garantit le respect des SLA`;
+}
+
+// ══════════════════════════════════════════════════════════════
+// RENDER ADAPTATION (avant / après + delta)
+// ══════════════════════════════════════════════════════════════
+function renderAdaptation(rule, metrics, latency, sc) {
+  const cfg = rule.config;
+  const def = prevConfig || { ecgHz:250, spo2Int:30, tempInt:60, comp:'Standard', alert:'Aucune', modules:6 };
+
+  const rows = [
+    { k:'ECG Hz',        b: def.ecgHz,    a: cfg.ecgHz,    unit:'Hz'  },
+    { k:'SpO₂ interval', b: def.spo2Int,  a: cfg.spo2Int,  unit:'s'   },
+    { k:'Temp. interval',b: def.tempInt,  a: cfg.tempInt,  unit:'s'   },
+    { k:'Compression',   b: def.comp,     a: cfg.comp,     unit:''    },
+    { k:'Canal alerte',  b: def.alert,    a: cfg.alert,    unit:''    },
+    { k:'Modules actifs',b: def.modules,  a: cfg.modules,  unit:''    },
+  ];
+
+  const deltaEcg = (typeof cfg.ecgHz==='number' && typeof def.ecgHz==='number') ? cfg.ecgHz - def.ecgHz : 0;
+  const slaOk    = (latency <= sc.qos.latency.sla) && (cfg.ecgHz >= sc.qos.ecgHz.sla);
+
+  el('dtRows').innerHTML = rows.map(row=>{
+    const changed = row.b !== row.a;
+    const delta   = typeof row.b==='number' && typeof row.a==='number' ? row.a-row.b : '—';
+    const dStr    = delta!=='—' ? (delta>0?'+':'')+delta+(row.unit||'') : '—';
+    const dCls    = delta!=='—' ? (delta>0?'dpos':'dneg') : '';
+    return `<div class="dt-row ${changed?'dtr-changed':'dtr-same'}">
+      <span class="dtr-k">${row.k}</span>
+      <span class="dtr-b">${row.b}${row.unit}</span>
+      <span class="dtr-a ${changed?'dtra-changed':''}">${row.a}${row.unit}</span>
+      <span class="dtr-d ${dCls}">${changed?dStr:'='}</span>
+    </div>`;
+  }).join('');
+
+  // KPI deltas
+  el('kpiDeltas').innerHTML = `
+    <div class="kpid ${deltaEcg>0?'kpid-pos':deltaEcg<0?'kpid-neg':'kpid-zero'}">
+      <span>Δ ECG :</span><strong>${deltaEcg>0?'+':''}${deltaEcg} Hz</strong>
+    </div>
+    <div class="kpid ${latency<=sc.qos.latency.sla?'kpid-pos':'kpid-neg'}">
+      <span>Latence mesurée :</span><strong>${latency}ms</strong>
+      <span class="kpid-target">(SLA: ${sc.qos.latency.target})</span>
+    </div>
+    <div class="kpid ${slaOk?'kpid-pos':'kpid-neg'}">
+      <span>SLA global :</span><strong>${slaOk?'✅ RESPECTÉ':'⚠ VIOLÉ'}</strong>
+    </div>`;
+
+  // Notification
+  const isCrit = sc.severity==='critical';
+  const notifCls = isCrit?'nb-crit':sc.severity==='moderate'?'nb-warn':'nb-ok';
+  el('notifBox').className   = 'notif-box '+notifCls;
+  el('nbIcon').textContent   = isCrit?'🚨':sc.severity==='moderate'?'⚠️':'✅';
+  el('nbTitle').textContent  = isCrit?'ALARME CRITIQUE — Dr. Martin notifiée':sc.severity==='moderate'?'Alerte modérée envoyée':'Surveillance normale — aucune alerte';
+  el('nbChan').textContent   = cfg.alert;
+
+  prevConfig = { ...cfg };
+  return { deltaEcg, slaOk };
+}
+
+// ══════════════════════════════════════════════════════════════
+// MEASURE SLA
+// ══════════════════════════════════════════════════════════════
+function measureSLA(metrics, rule, latency, sc) {
+  const q = sc.qos;
+  const cfg = rule.config;
+
+  const checks = [
+    { k:'latency', meas: latency,         sla: q.latency.sla,  label: latency+'ms'        },
+    { k:'freq',    meas: cfg.ecgHz,       sla: q.ecgHz.sla,    label: cfg.ecgHz+'Hz'       },
+    { k:'uptime',  meas: r(990,999)/10,   sla: q.uptime.sla,   label: (r(990,999)/10)+'%'  },
+    { k:'bw',      meas: metrics.network_bw, sla: q.bw.sla,   label: metrics.network_bw+'Kbps' },
+  ];
+
+  let okCount = 0;
+  checks.forEach(c=>{
+    const ok   = c.meas >= c.sla;
+    if(ok) okCount++;
+    el(`sla-${c.k}-meas`).textContent = c.label;
+    const b = el(`sla-${c.k}-badge`);
+    b.textContent = ok ? '✅ OK' : '⚠ VIOLÉ';
+    b.className   = 'sla-badge ' + (ok?'sb-ok':'sb-fail');
+    const card = el(`sla-${c.k}`);
+    if(card) card.className = 'sla-card ' + (ok?'slac-ok':'slac-fail');
+  });
+
+  const pct   = Math.round((okCount/checks.length)*100);
+  const score = el('slacScore');
+  score.textContent = pct + '%';
+  score.style.color = pct>=75?'#4ade80':pct>=50?'#fbbf24':'#f87171';
+  el('slacDetail').textContent = `${okCount}/${checks.length} SLA respectés — ${pct>=75?'Conforme':'Non conforme'}`;
+}
+
+// ══════════════════════════════════════════════════════════════
+// PROOF POINT INDICATORS
+// ══════════════════════════════════════════════════════════════
+function provePoint1(sit, metrics) {
+  const p = el('pi1');
+  p.innerHTML = `<span style="color:${sit.color};font-weight:700">${sit.name}</span>`;
+  el('proof1').style.borderColor = sit.color;
+}
+
+function provePoint2(sit, sc, slaOk) {
+  const p = el('pi2');
+  const ok = slaOk;
+  p.innerHTML = `<span style="color:${ok?'#4ade80':'#f87171'};font-weight:700">${ok?'SLA ✅':'SLA ⚠'}</span>`;
+  el('proof2').style.borderColor = ok?'#4ade80':'#f87171';
+}
+
+function provePoint3(adaptResult) {
+  const p = el('pi3');
+  const txt = adaptResult.deltaEcg!==0
+    ? `Δ ECG ${adaptResult.deltaEcg>0?'+':''}${adaptResult.deltaEcg}Hz`
+    : 'Config inchangée';
+  p.innerHTML = `<span style="color:${adaptResult.slaOk?'#4ade80':'#f87171'};font-weight:700">${txt}</span>`;
+  el('proof3').style.borderColor = adaptResult.slaOk?'#4ade80':'#f87171';
+}
+
+// ══════════════════════════════════════════════════════════════
+// PROGRESS HELPERS
+// ══════════════════════════════════════════════════════════════
+function activateStep(n) {
+  const s = el(`ppb${n}`); if(s) s.classList.add('ppb-active');
+}
+function doneStep(n) {
+  const s = el(`ppb${n}`); if(s) { s.classList.remove('ppb-active'); s.classList.add('ppb-done'); }
+}
+async function animProg(n, ms) {
+  const fill = el(`ppbf${n}`); if(!fill) return;
+  const steps = 20; const dt = ms/steps;
+  for(let i=0;i<=steps;i++) { fill.style.width=(i/steps*100)+'%'; await sleep(dt); }
 }
