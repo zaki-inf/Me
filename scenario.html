@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Scénario Complet — Ai Medical InFo</title>
+  <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="scenario.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+</head>
+<body class="scenario-body">
+
+  <!-- TOP BAR -->
+  <header class="scen-header">
+    <div class="scen-header-inner">
+      <div class="scen-logo">
+        <svg viewBox="0 0 40 40" fill="none" class="scen-logo-svg">
+          <circle cx="20" cy="20" r="18" stroke="#38bdf8" stroke-width="2"/>
+          <path d="M6 20h5l3-7 4 14 4-10 3 3h9" stroke="#38bdf8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <div>
+          <span class="scen-logo-name">Ai Medical InFo</span>
+          <span class="scen-logo-sub">Scénario Complet — Pipeline e-Santé</span>
+        </div>
+      </div>
+      <div class="scen-header-right">
+        <div class="scen-clock" id="scenClock">--:--:--</div>
+        <div class="sim-status" id="simStatus">
+          <span class="sim-dot idle"></span>
+          <span id="simStatusText">Prêt</span>
+        </div>
+        <button class="btn-start" id="btnStart" onclick="startSimulation()">▶ Lancer le scénario</button>
+        <button class="btn-stop" id="btnStop" onclick="stopSimulation()" disabled>⏹ Arrêter</button>
+        <a href="index.html" class="btn-back">← Retour</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- SCENARIO LEGEND -->
+  <div class="scenario-legend">
+    <div class="legend-title">Sélectionner l'état du patient :</div>
+    <button class="leg-btn leg-stable  active" onclick="setState('stable')"  id="btnStable">🟢 Stable</button>
+    <button class="leg-btn leg-moderate"       onclick="setState('moderate')" id="btnModerate">🟡 Modéré</button>
+    <button class="leg-btn leg-critical"       onclick="setState('critical')" id="btnCritical">🔴 Critique</button>
+    <div class="legend-sep"></div>
+    <div class="legend-info" id="legendInfo">Cliquez sur <strong>Lancer le scénario</strong> pour démarrer la simulation.</div>
+  </div>
+
+  <!-- MAIN LAYOUT -->
+  <div class="scenario-main">
+
+    <!-- ═══ COLONNE GAUCHE : Patient + Capteur ═══ -->
+    <div class="scen-col scen-col-left">
+
+      <!-- PATIENT -->
+      <div class="scen-card" id="card-patient">
+        <div class="card-header">
+          <span class="card-icon">👤</span>
+          <div>
+            <div class="card-title">Patient</div>
+            <div class="card-sub">Ahmed Benali — ID: P-0042</div>
+          </div>
+          <div class="card-status" id="status-patient">En attente</div>
+        </div>
+        <div class="patient-info">
+          <div class="pi-row"><span>Âge</span><strong>38 ans</strong></div>
+          <div class="pi-row"><span>Pathologie</span><strong>Suivi post-op</strong></div>
+          <div class="pi-row"><span>Dispositif</span><strong>IoT BLE v2</strong></div>
+          <div class="pi-row"><span>Réseau</span><strong id="networkType">WiFi 5G</strong></div>
+        </div>
+
+        <!-- ECG WAVEFORM -->
+        <div class="ecg-container">
+          <div class="ecg-label">ECG en direct</div>
+          <svg class="ecg-svg" id="ecgSvg" viewBox="0 0 500 80" preserveAspectRatio="none">
+            <rect width="500" height="80" fill="#0a1628"/>
+            <!-- Grid -->
+            <line x1="0" y1="20" x2="500" y2="20" stroke="#1e3a5f" stroke-width="0.5"/>
+            <line x1="0" y1="40" x2="500" y2="40" stroke="#1e3a5f" stroke-width="1"/>
+            <line x1="0" y1="60" x2="500" y2="60" stroke="#1e3a5f" stroke-width="0.5"/>
+            <line x1="100" y1="0" x2="100" y2="80" stroke="#1e3a5f" stroke-width="0.5"/>
+            <line x1="200" y1="0" x2="200" y2="80" stroke="#1e3a5f" stroke-width="0.5"/>
+            <line x1="300" y1="0" x2="300" y2="80" stroke="#1e3a5f" stroke-width="0.5"/>
+            <line x1="400" y1="0" x2="400" y2="80" stroke="#1e3a5f" stroke-width="0.5"/>
+            <polyline id="ecgPath" fill="none" stroke="#00ff88" stroke-width="1.8"
+              points="0,40 30,40 45,40 52,10 57,70 64,40 90,40 120,40 135,40 142,12 147,68 154,40 180,40 210,40 225,40 232,10 237,70 244,40 270,40 300,40 315,40 322,12 327,68 334,40 360,40 390,40 405,40 412,10 417,70 424,40 450,40 480,40 495,40"/>
+          </svg>
+          <div class="ecg-metrics" id="ecgMetrics">
+            <span>HR: <strong id="liveHR">--</strong> bpm</span>
+            <span>SpO₂: <strong id="liveSPO2">--</strong>%</span>
+            <span>Temp: <strong id="liveTemp">--</strong>°C</span>
+          </div>
+        </div>
+
+        <div class="packet-preview" id="packetPreview">
+          <div class="pp-label">📦 Paquet ECG généré</div>
+          <pre id="packetJson" class="pp-json">En attente...</pre>
+        </div>
+      </div>
+
+      <!-- CAPTEUR / GATEWAY -->
+      <div class="scen-card" id="card-gateway">
+        <div class="card-header">
+          <span class="card-icon">📡</span>
+          <div>
+            <div class="card-title">Capteur BLE + Gateway</div>
+            <div class="card-sub">Protocole : BLE → WiFi → HTTPS</div>
+          </div>
+          <div class="card-status" id="status-gateway">Inactif</div>
+        </div>
+        <div class="gateway-info">
+          <div class="gw-row">
+            <span class="gw-key">Protocole sortant</span>
+            <span class="gw-val">HTTPS/TLS 1.3</span>
+          </div>
+          <div class="gw-row">
+            <span class="gw-key">Endpoint cible</span>
+            <span class="gw-val mono">POST /api/v1/ecg</span>
+          </div>
+          <div class="gw-row">
+            <span class="gw-key">Compression</span>
+            <span class="gw-val" id="compressionLevel">Standard</span>
+          </div>
+          <div class="gw-row">
+            <span class="gw-key">Fréquence ECG</span>
+            <span class="gw-val" id="ecgFreq">250 Hz</span>
+          </div>
+          <div class="gw-row">
+            <span class="gw-key">Paquets envoyés</span>
+            <span class="gw-val" id="packetCount">0</span>
+          </div>
+        </div>
+        <div class="send-indicator" id="sendIndicator">
+          <div class="send-dot"></div>
+          <span>Transmission en cours...</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ═══ CENTRE : Pipeline animé ═══ -->
+    <div class="scen-col scen-col-center">
+
+      <div class="pipeline-wrap">
+
+        <!-- STEP 1 : Web Service -->
+        <div class="pipe-step" id="pipe-ws">
+          <div class="pipe-node" id="node-ws">
+            <span class="pipe-icon">⚙️</span>
+            <span class="pipe-label">Web Service</span>
+            <span class="pipe-method">POST /api/v1/ecg</span>
+          </div>
+          <div class="pipe-detail" id="detail-ws">
+            <div class="pd-title">Traitement reçu</div>
+            <div class="pd-row"><span>Statut HTTP</span><span id="ws-status" class="pd-val">—</span></div>
+            <div class="pd-row"><span>Validation</span><span id="ws-valid" class="pd-val">—</span></div>
+            <div class="pd-row"><span>Moteur adapt.</span><span id="ws-adapt" class="pd-val">—</span></div>
+            <div class="pd-row"><span>Durée traitement</span><span id="ws-time" class="pd-val">—</span></div>
+          </div>
+        </div>
+
+        <div class="pipe-arrow" id="arrow-ws-db">
+          <div class="arrow-line"><div class="arrow-packet" id="pkt-ws-db"></div></div>
+          <svg class="arrow-head" viewBox="0 0 10 10"><polygon points="0,0 10,5 0,10" fill="#38bdf8"/></svg>
+        </div>
+
+        <!-- STEP 2 : Base de données -->
+        <div class="pipe-step" id="pipe-db">
+          <div class="pipe-node" id="node-db">
+            <span class="pipe-icon">🗄️</span>
+            <span class="pipe-label">Base de Données</span>
+            <span class="pipe-method">TimescaleDB · INSERT</span>
+          </div>
+          <div class="pipe-detail" id="detail-db">
+            <div class="pd-title">Enregistrement</div>
+            <div class="pd-row"><span>Table</span><span class="pd-val mono">vitals_stream</span></div>
+            <div class="pd-row"><span>Entrées totales</span><span id="db-count" class="pd-val">—</span></div>
+            <div class="pd-row"><span>Partition active</span><span class="pd-val mono">2026-05</span></div>
+            <div class="pd-row"><span>Réplication</span><span class="pd-val" id="db-repl">—</span></div>
+          </div>
+        </div>
+
+        <div class="pipe-arrow" id="arrow-db-api">
+          <div class="arrow-line"><div class="arrow-packet" id="pkt-db-api"></div></div>
+          <svg class="arrow-head" viewBox="0 0 10 10"><polygon points="0,0 10,5 0,10" fill="#38bdf8"/></svg>
+        </div>
+
+        <!-- STEP 3 : API -->
+        <div class="pipe-step" id="pipe-api">
+          <div class="pipe-node" id="node-api">
+            <span class="pipe-icon">🔌</span>
+            <span class="pipe-label">REST API</span>
+            <span class="pipe-method">GET /api/v1/patients/P-0042</span>
+          </div>
+          <div class="pipe-detail" id="detail-api">
+            <div class="pd-title">Réponse API</div>
+            <div class="pd-row"><span>Code</span><span id="api-code" class="pd-val">—</span></div>
+            <div class="pd-row"><span>Latence</span><span id="api-latency" class="pd-val">—</span></div>
+            <div class="pd-row"><span>Alerte déclenchée</span><span id="api-alert" class="pd-val">—</span></div>
+            <div class="pd-row"><span>Mode adaptation</span><span id="api-mode" class="pd-val">—</span></div>
+          </div>
+        </div>
+
+        <div class="pipe-arrow" id="arrow-api-dash">
+          <div class="arrow-line"><div class="arrow-packet" id="pkt-api-dash"></div></div>
+          <svg class="arrow-head" viewBox="0 0 10 10"><polygon points="0,0 10,5 0,10" fill="#38bdf8"/></svg>
+        </div>
+
+        <!-- STEP 4 : Dashboard -->
+        <div class="pipe-step" id="pipe-dash">
+          <div class="pipe-node" id="node-dash">
+            <span class="pipe-icon">🖥️</span>
+            <span class="pipe-label">Dashboard Médecin</span>
+            <span class="pipe-method">Mise à jour temps réel</span>
+          </div>
+          <div class="pipe-detail" id="detail-dash">
+            <div class="pd-title">Affichage</div>
+            <div class="pd-row"><span>Médecin notifié</span><span id="dash-doc" class="pd-val">—</span></div>
+            <div class="pd-row"><span>Alerte visuelle</span><span id="dash-alert" class="pd-val">—</span></div>
+            <div class="pd-row"><span>Canal d'alerte</span><span id="dash-channel" class="pd-val">—</span></div>
+            <div class="pd-row"><span>Latence totale</span><span id="dash-total" class="pd-val">—</span></div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- CYCLE COUNTER -->
+      <div class="cycle-info">
+        <div class="ci-item"><span class="ci-label">Cycle</span><span class="ci-val" id="cycleCount">0</span></div>
+        <div class="ci-item"><span class="ci-label">Latence moy.</span><span class="ci-val" id="avgLatency">—</span></div>
+        <div class="ci-item"><span class="ci-label">Alertes</span><span class="ci-val" id="alertCount">0</span></div>
+        <div class="ci-item"><span class="ci-label">Mode actuel</span><span class="ci-val" id="currentMode">—</span></div>
+      </div>
+
+    </div>
+
+    <!-- ═══ COLONNE DROITE : API JSON + Terminal + Dashboard ═══ -->
+    <div class="scen-col scen-col-right">
+
+      <!-- API RESPONSE -->
+      <div class="scen-card" id="card-api">
+        <div class="card-header">
+          <span class="card-icon">📄</span>
+          <div>
+            <div class="card-title">Réponse API (JSON)</div>
+            <div class="card-sub">GET /api/v1/patients/P-0042/vitals</div>
+          </div>
+          <div class="card-status" id="status-api">200 OK</div>
+        </div>
+        <pre class="api-json" id="apiJsonDisplay">{
+  "status": "waiting",
+  "message": "Démarrez la simulation..."
+}</pre>
+      </div>
+
+      <!-- DASHBOARD MÉDECIN -->
+      <div class="scen-card" id="card-dashboard">
+        <div class="card-header">
+          <span class="card-icon">🖥️</span>
+          <div>
+            <div class="card-title">Dashboard Médecin</div>
+            <div class="card-sub">Dr. Sophie Martin</div>
+          </div>
+          <div class="card-status" id="status-dash">Connecté</div>
+        </div>
+
+        <div class="mini-dashboard">
+          <div class="md-vitals">
+            <div class="md-vital" id="mdHR">
+              <div class="md-icon">❤️</div>
+              <div class="md-val" id="dashHR">--</div>
+              <div class="md-unit">bpm</div>
+              <div class="md-lbl">FC</div>
+            </div>
+            <div class="md-vital" id="mdSPO2">
+              <div class="md-icon">🫁</div>
+              <div class="md-val" id="dashSPO2">--</div>
+              <div class="md-unit">%</div>
+              <div class="md-lbl">SpO₂</div>
+            </div>
+            <div class="md-vital" id="mdTemp">
+              <div class="md-icon">🌡️</div>
+              <div class="md-val" id="dashTemp">--</div>
+              <div class="md-unit">°C</div>
+              <div class="md-lbl">Temp</div>
+            </div>
+            <div class="md-vital" id="mdBP">
+              <div class="md-icon">💉</div>
+              <div class="md-val" id="dashBP" style="font-size:.95rem">--/--</div>
+              <div class="md-unit">mmHg</div>
+              <div class="md-lbl">PA</div>
+            </div>
+          </div>
+
+          <div class="md-alert-zone" id="mdAlertZone">
+            <div class="mda-icon" id="mdaIcon">📊</div>
+            <div class="mda-text" id="mdaText">En attente de données...</div>
+          </div>
+
+          <div class="md-mode-bar" id="mdModeBar">
+            <span class="mdb-label">Mode actif :</span>
+            <span class="mdb-val" id="mdbMode">—</span>
+            <span class="mdb-freq" id="mdbFreq"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- TERMINAL LOGS -->
+      <div class="scen-card card-terminal">
+        <div class="card-header">
+          <span class="card-icon">⌨️</span>
+          <div>
+            <div class="card-title">Journal système</div>
+            <div class="card-sub">Logs en temps réel</div>
+          </div>
+          <button class="btn-clear-log" onclick="clearLog()">Vider</button>
+        </div>
+        <div class="terminal" id="terminal">
+          <div class="term-line term-info">[SYSTEM] Plateforme Ai Medical InFo initialisée.</div>
+          <div class="term-line term-info">[SYSTEM] En attente du démarrage de la simulation...</div>
+        </div>
+      </div>
+
+    </div>
+
+  </div><!-- end scenario-main -->
+
+  <script src="scenario.js"></script>
+</body>
+</html>
