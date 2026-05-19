@@ -71,6 +71,7 @@ async function startScenario() {
   el('simDot').className = 'sim-dot sd-run';
   el('simLabel').textContent = 'En cours';
   log('ts', `[SYS] ══ DÉMARRAGE — ${currentScenario.name} ══`);
+  TimelineView.start();
 
   (function loop() {
     if (!running) return;
@@ -159,6 +160,7 @@ async function runFullCycle() {
   const latency     = metrics.alert_latency_ms || (Math.floor(Math.random() * 161) + 120);
   const adaptResult = EvidenceLayer.render(rule, metrics, latency, sc);
   EvidenceLayer.provePoints(situation, sc, adaptResult.slaOk, adaptResult.deltaEcg);
+  TimelineView.addEvent(situation, rule, adaptResult.deltaEcg);
   log('ta', `[M5] Δ ECG:${adaptResult.deltaEcg > 0 ? '+' : ''}${adaptResult.deltaEcg}Hz · ` +
             `SLA:${adaptResult.slaOk ? '✅ respecté' : '⚠ violé'}`);
   await animProg(5, 450);

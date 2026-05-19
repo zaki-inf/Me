@@ -312,6 +312,28 @@
   <div class="ppb-arrow ppb-loop">↺</div>
 </div>
 
+<!-- ══════════ TIMELINE VIEW ══════════ -->
+<div class="tlv-outer">
+  <div class="tlv-hdr">
+    <span class="tlv-title">📈 Timeline adaptative</span>
+    <div class="tlv-legend">
+      <span class="tll"><span class="tll-dot" style="background:#4ade80"></span>Normal</span>
+      <span class="tll"><span class="tll-dot" style="background:#38bdf8"></span>Dégradé</span>
+      <span class="tll"><span class="tll-dot" style="background:#fbbf24"></span>Modéré</span>
+      <span class="tll"><span class="tll-dot" style="background:#fb923c"></span>IoT Cntrnt</span>
+      <span class="tll"><span class="tll-dot" style="background:#ef4444"></span>Critique</span>
+      <span class="tll"><span class="tll-dot" style="background:#f87171"></span>Tempête / Sat.</span>
+      <span class="tll"><span class="tll-dot tll-sq" style="background:#f97316"></span>Adaptation</span>
+    </div>
+    <button class="tlv-clr-btn" onclick="TimelineView.clear()">🗑 Effacer</button>
+  </div>
+  <div class="tlv-wrap" id="tlvWrap">
+    <div class="tlv-track" id="tlvTrack">
+      <span class="tlv-empty">Lancez un scénario pour voir la timeline</span>
+    </div>
+  </div>
+</div>
+
 <!-- ══════════ BOTTOM : counters + terminal ══════════ -->
 <div class="sc-bottom">
   <div class="sc-counters">
@@ -335,6 +357,7 @@
 <script src="module3-situation-engine.js"></script>
 <script src="module4-decision-engine.js"></script>
 <script src="module5-evidence-layer.js"></script>
+<script src="module-timeline.js"></script>
 <script src="scenario.js"></script>
 </body>
 </html>
