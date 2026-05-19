@@ -138,6 +138,7 @@
     <div class="col-header ch1">
       <span class="col-step">01</span>
       <span class="col-title">🎯 Objectif &amp; QoS/SLA</span>
+      <span class="col-mod">M1 · Generator</span>
     </div>
     <div class="col-body">
 
@@ -181,11 +182,12 @@
     </div>
   </div>
 
-  <!-- ── COL 2 : MÉTRIQUE (interprétée) ── -->
+  <!-- ── COL 2 : MONITORING LAYER ── -->
   <div class="sc-col" id="col2">
     <div class="col-header ch2">
       <span class="col-step">02</span>
-      <span class="col-title">📊 Métriques interprétées</span>
+      <span class="col-title">📊 Monitoring Layer</span>
+      <span class="col-mod">M2 · Monitoring</span>
     </div>
     <div class="col-body">
 
@@ -203,11 +205,12 @@
     </div>
   </div>
 
-  <!-- ── COL 3 : SITUATION ── -->
+  <!-- ── COL 3 : OSM SITUATION ENGINE ── -->
   <div class="sc-col" id="col3">
     <div class="col-header ch3">
       <span class="col-step">03</span>
-      <span class="col-title">🔍 Situation classifiée</span>
+      <span class="col-title">🔍 OSM Situation Engine</span>
+      <span class="col-mod">M3 · OSM</span>
     </div>
     <div class="col-body">
 
@@ -229,11 +232,12 @@
     </div>
   </div>
 
-  <!-- ── COL 4 : DÉCISION ── -->
+  <!-- ── COL 4 : DECISION ENGINE ── -->
   <div class="sc-col" id="col4">
     <div class="col-header ch4">
       <span class="col-step">04</span>
-      <span class="col-title">⚖️ Décision &amp; Règle</span>
+      <span class="col-title">⚖️ Decision Engine</span>
+      <span class="col-mod">M4 · Decision</span>
     </div>
     <div class="col-body">
 
@@ -241,6 +245,11 @@
         <div class="rfb-id" id="rfbId">—</div>
         <div class="rfb-cond" id="rfbCond">En attente...</div>
         <div class="rfb-action" id="rfbAction">—</div>
+      </div>
+
+      <div class="adapt-plan-box">
+        <div class="apb-title">Plan d'adaptation</div>
+        <div id="adaptPlan">—</div>
       </div>
 
       <div class="rule-chain" id="ruleChain">
@@ -255,11 +264,12 @@
     </div>
   </div>
 
-  <!-- ── COL 5 : ADAPTATION avant/après ── -->
+  <!-- ── COL 5 : EVIDENCE & EVALUATION ── -->
   <div class="sc-col" id="col5">
     <div class="col-header ch5">
       <span class="col-step">05</span>
-      <span class="col-title">⚡ Adaptation mesurable</span>
+      <span class="col-title">⚡ Evidence &amp; Evaluation</span>
+      <span class="col-mod">M5 · Evidence</span>
     </div>
     <div class="col-body">
 
@@ -320,6 +330,11 @@
 </div>
 
 <script src="prometheus-client.js"></script>
+<script src="module1-scenario-generator.js"></script>
+<script src="module2-monitoring-layer.js"></script>
+<script src="module3-situation-engine.js"></script>
+<script src="module4-decision-engine.js"></script>
+<script src="module5-evidence-layer.js"></script>
 <script src="scenario.js"></script>
 </body>
 </html>
